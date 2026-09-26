@@ -1,3 +1,4 @@
+using System.IO;
 using System.Diagnostics;
 using System.Net.Sockets;
 using Link.Windows.Installer.Core.Models;
