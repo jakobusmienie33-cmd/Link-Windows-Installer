@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+artifacts/
+staging/
+packages/
+*.msi
+*.msix
+*.exe
+*.appx
+*.appxbundle
+*.log
+local.settings.json
