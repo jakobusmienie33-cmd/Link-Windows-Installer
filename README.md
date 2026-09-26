@@ -2,45 +2,54 @@
 
 Source repository for **The Link Windows Installation & Configuration Wizard**.
 
-> Status: LWI-P0/14 through LWI-P2/14 foundation.
+> Current implementation: **LWI-P0/14 through LWI-P2/14**.
 
 ## Canonical UI reference
 
-The implementation follows `the_link_windows_installer_comprehensive_mockup.html` as the canonical Windows installer UI and interaction reference. The production source preserves the mockup's 12-step wizard, The Link visual language, system-check experience, workstation profiles and database deployment rules.
+The implementation follows `the_link_windows_installer_comprehensive_mockup.html` as the canonical Windows installer UI and interaction reference. The production source preserves its 12-step wizard, dark Link header/sidebar, green status language, card layouts, workstation profiles, database deployment rules and guided setup model.
 
-## Current phase scope
+**Branding attribution:** By MeetWell Technologies.
+
+## Completed foundation
 
 - **LWI-P0/14 — Repository & Architecture Foundation**
 - **LWI-P1/14 — Installer Shell & Branding**
 - **LWI-P2/14 — Windows Environment Detection**
 
-The final installer executable is **not generated in this repository automatically**. Source validation and build preparation are provided; final EXE packaging remains a manual release step.
+The final installer executable is **not generated automatically**. Source validation and build checks are provided; final EXE packaging remains a manual release step.
 
 ## Technology
 
 - C# / .NET 8
-- WPF Windows desktop UI
+- WPF
 - No third-party UI framework
-- Windows-native compatibility checks
-- Architecture prepared for later install, repair, upgrade and uninstall engines
+- Windows-native system probing
+- Platform-neutral compatibility rules separated from Windows probing
+- Architecture prepared for install, repair, upgrade and uninstall engines
 
 ## Development
 
-Open `Link.Windows.Installer.sln` in Visual Studio 2022 or build from a Windows machine with the .NET 8 SDK:
+On Windows with the .NET 8 SDK:
 
 ```powershell
 dotnet restore
 dotnet build .\Link.Windows.Installer.sln -c Debug
 ```
 
-Source-only validation:
+Run source validation:
 
 ```powershell
 .\scripts\validate-source.ps1
 ```
 
-## Release policy
+## Database deployment rule
 
-The installer consumes prepared Link-Core Windows release artifacts. It must not contain production Supabase `service_role` secrets and normal workstation setup must not execute production DDL migrations.
+A normal workstation uses **Cloud Supabase/PostgreSQL + local SQLite**. Local PostgreSQL is an advanced branch/server option only.
 
-Built@Home
+The desktop installer must never store a production Supabase `service_role` secret or run production cloud DDL from an ordinary workstation installation.
+
+## Release rule
+
+The installer will consume a prepared Link-Core Windows release artifact in later phases. Link-Core source code is not copied into this repository.
+
+**By MeetWell Technologies**
