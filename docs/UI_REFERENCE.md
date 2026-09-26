@@ -1,45 +1,47 @@
-# Windows Installer UI Reference
+# Canonical Windows Installer UI Reference
 
-Canonical reference: `the_link_windows_installer_comprehensive_mockup.html`.
+The canonical reference is:
+
+`the_link_windows_installer_comprehensive_mockup.html`
 
 ## Required visual language
-- dark charcoal Link system header
-- "The Link" wordmark with bright green Link accent
-- "Windows Setup" module title
-- pale grey-blue background
-- white rounded wizard surface
-- dark left setup rail
-- green current/completed states
-- white cards with thin grey borders
-- blue information, amber warning and red blocking states
-- bottom Back / Next / Cancel controls
 
-## Canonical 12-step flow
-1. Welcome
-2. System Check
-3. Install Type
-4. Components
-5. Database / SQL
-6. Install Location
-7. Device & Services
-8. Network & Security
-9. Updates & Privacy
-10. Review
-11. Installing
-12. Complete
+Production WPF screens retain:
+- dark The Link top system bar,
+- dark left 12-step progress rail,
+- The Link green accent/status language,
+- white cards on the soft grey workspace,
+- compact status pills/notices,
+- Back / Next / Cancel footer controls,
+- guided explanations suitable for the Finn Test,
+- **By MeetWell Technologies** attribution.
 
-P0-P2 implement the shell plus the first three experiences.
+## Implemented HTML-matched screens
 
-## Profiles
-- Standard Workstation
-- POS / Sharing Point
-- Back-Office / Admin
-- Branch Server / Advanced
+### Step 1 — Welcome
+Core application, local SQLite, optional branch PostgreSQL and device-service explanation.
 
-A profile changes setup defaults only. It never grants application privileges.
+### Step 2 — System Check
+Live Windows compatibility checks rather than static sample values.
 
-## Database rule
-Normal workstation = Cloud Supabase/PostgreSQL + local SQLite. Existing/local PostgreSQL = advanced branch/server deployment.
+### Step 3 — Install Type
+Standard Workstation, POS / Sharing Point, Back-Office / Admin and Branch Server / Advanced.
 
-## Attribution
-Use **By MeetWell Technologies**.
+### Step 4 — Components
+Component cards plus a live prerequisite inventory and signed-payload remediation state.
+
+### Step 5 — Database / SQL
+Four canonical database modes:
+- Cloud Supabase + Local SQLite,
+- Existing PostgreSQL,
+- Install Local PostgreSQL,
+- SQLite-only/offline preparation.
+
+The production screen adds real discovery, endpoint tests, PostgreSQL authenticated self-test support and security-plan preview.
+
+### Step 6 — Install Location
+Canonical application/data/cache/log paths plus backup/checkpoint path, install scope and live layout validation.
+
+## UI rule
+
+HTML is the design reference; WPF is the production implementation. Behaviour must be backed by installer services rather than simulated HTML-only state.

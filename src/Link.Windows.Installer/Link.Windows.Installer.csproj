@@ -8,7 +8,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>Link.Windows.Installer</AssemblyName>
     <RootNamespace>Link.Windows.Installer</RootNamespace>
-    <Version>0.2.0</Version>
+    <Version>0.7.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Link.Windows.Installer.Core\Link.Windows.Installer.Core.csproj" />
