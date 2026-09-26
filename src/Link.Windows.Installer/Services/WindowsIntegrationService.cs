@@ -58,13 +58,20 @@ public sealed class WindowsIntegrationService
             "$s.Description='The Link';" +
             "$s.Save();";
 
-        using var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        var startInfo = new System.Diagnostics.ProcessStartInfo
         {
             FileName = "powershell.exe",
-            Arguments = "-NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "" + script.Replace(""", "\"") + """,
             UseShellExecute = false,
             CreateNoWindow = true
-        });
+        };
+        startInfo.ArgumentList.Add("-NoProfile");
+        startInfo.ArgumentList.Add("-NonInteractive");
+        startInfo.ArgumentList.Add("-ExecutionPolicy");
+        startInfo.ArgumentList.Add("Bypass");
+        startInfo.ArgumentList.Add("-Command");
+        startInfo.ArgumentList.Add(script);
+
+        using var process = System.Diagnostics.Process.Start(startInfo);
 
         process?.WaitForExit(10000);
         if (!File.Exists(shortcutPath))
