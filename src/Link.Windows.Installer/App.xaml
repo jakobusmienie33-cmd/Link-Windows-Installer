@@ -1,6 +1,6 @@
 <Application x:Class="Link.Windows.Installer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"\n             xmlns:coreModels="clr-namespace:Link.Windows.Installer.Core.Models;assembly=Link.Windows.Installer.Core"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <SolidColorBrush x:Key="GreenBrush" Color="#74EB49"/>
@@ -54,9 +54,9 @@
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="Background" Value="#EAF2FB"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding State}" Value="Pass"><Setter Property="Background" Value="#E8F8E5"/></DataTrigger>
-                <DataTrigger Binding="{Binding State}" Value="Warning"><Setter Property="Background" Value="#FFF5DE"/></DataTrigger>
-                <DataTrigger Binding="{Binding State}" Value="Block"><Setter Property="Background" Value="#FFEDED"/></DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static coreModels:SystemCheckState.Pass}"><Setter Property="Background" Value="#E8F8E5"/></DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static coreModels:SystemCheckState.Warning}"><Setter Property="Background" Value="#FFF5DE"/></DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static coreModels:SystemCheckState.Block}"><Setter Property="Background" Value="#FFEDED"/></DataTrigger>
             </Style.Triggers>
         </Style>
 
