@@ -1,3 +1,4 @@
+using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Link.Windows.Installer.Core.Models;
