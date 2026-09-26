@@ -65,7 +65,8 @@ if ($version -ne "0.7.0-dev") {
 }
 
 $bootstrap = Get-Content (Join-Path $root "src/Link.Windows.Installer.Core/Services/DatabaseBootstrapPlanner.cs") -Raw
-if ($bootstrap -notmatch "RunsProductionCloudDdl" -or $bootstrap -notmatch "false") {
+$cloudInvariant = "Production PostgreSQL RLS/policies/explicit Data API grants remain centrally managed"
+if (-not $bootstrap.Contains($cloudInvariant)) {
   throw "Database bootstrap production-cloud-DDL invariant is missing."
 }
 
