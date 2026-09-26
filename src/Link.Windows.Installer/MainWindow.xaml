@@ -1,0 +1,420 @@
+<Window x:Class="Link.Windows.Installer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="The Link — Windows Setup"
+        Width="1280"
+        Height="840"
+        MinWidth="1024"
+        MinHeight="720"
+        WindowStartupLocation="CenterScreen"
+        Background="#DFE7EC"
+        FontFamily="Segoe UI">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="68"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="#101B24">
+            <Grid Margin="28,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="34" FontWeight="Bold" Foreground="White">
+                    <Run Text="The "/><Run Text="Link" Foreground="{StaticResource GreenBrush}"/>
+                </TextBlock>
+                <Border Grid.Column="1" Width="1" Height="34" Margin="20,0" Background="#52616A" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Windows Setup" VerticalAlignment="Center" FontSize="23" FontWeight="SemiBold" Foreground="White"/>
+                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="● Installer Ready" Foreground="#72E967" FontSize="12" Margin="0,0,16,0"/>
+                    <TextBlock Text="Windows 10 / 11 • x64 / ARM64 profiles" Foreground="#C6D1D7" FontSize="12"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="24">
+            <Border Background="White" BorderBrush="#CBD7DD" BorderThickness="1" CornerRadius="18">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="312"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="#172B35" CornerRadius="18,0,0,18">
+                        <Grid Margin="18,22">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" Width="62" Height="62" HorizontalAlignment="Left"
+                                    Background="{StaticResource Green2Brush}" CornerRadius="16">
+                                <TextBlock Text="L" FontSize="32" FontWeight="Bold" Foreground="#153019"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <StackPanel Grid.Row="1" Margin="0,12,0,12">
+                                <TextBlock Text="The Link" Foreground="White" FontSize="23" FontWeight="Bold"/>
+                                <TextBlock Text="Comprehensive Windows Installation &amp; Configuration Wizard"
+                                           Foreground="#B8C6CC" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                            </StackPanel>
+
+                            <ListBox Grid.Row="2"
+                                     ItemsSource="{Binding Steps}"
+                                     SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     ItemContainerStyle="{StaticResource StepItemStyle}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="34"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Width="26" Height="26" CornerRadius="13" Background="#28414C" HorizontalAlignment="Left">
+                                                <TextBlock Text="{Binding Number}" Foreground="#C8D6DC" FontSize="10" FontWeight="Bold"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="1" Text="{Binding Title}" Foreground="#D8E6EB"
+                                                       VerticalAlignment="Center" FontSize="11"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding StateText}" Foreground="{StaticResource GreenBrush}"
+                                                       VerticalAlignment="Center" FontSize="9"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel Grid.Row="3">
+                                <Border Height="1" Background="#40545D" Margin="0,8,0,10"/>
+                                <TextBlock Text="By MeetWell Technologies" FontWeight="SemiBold" Foreground="#D2DEE3" FontSize="10"/>
+                                <TextBlock Text="Signed packages • least privilege • auditable setup" Foreground="#8EA0A8" FontSize="9" Margin="0,3,0,0"/>
+                                <TextBlock Text="Installer source • v0.2.0-dev" Foreground="#8EA0A8" FontSize="9"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Column="1" Background="#F8FAFB">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="72"/>
+                        </Grid.RowDefinitions>
+
+                        <TabControl Grid.Row="0"
+                                    SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Margin="28,24,28,16">
+                            <TabControl.Resources>
+                                <Style TargetType="TabItem">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </Style>
+                            </TabControl.Resources>
+
+                            <TabItem>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Welcome to The Link Setup" FontSize="27" FontWeight="Bold" Foreground="#15212A"/>
+                                                <TextBlock Text="This wizard installs The Link for Windows, prepares the appropriate local data layer, configures optional hardware services and leaves organisation access to the normal Link sign-in process."
+                                                           FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,6,20,0"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Background="#EAF8E7" CornerRadius="12" Padding="9,5" VerticalAlignment="Top">
+                                                <TextBlock Text="Step 1 of 12" Foreground="#34852E" FontWeight="SemiBold" FontSize="10"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <Border Style="{StaticResource CardStyle}">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,8">
+                                                    <TextBlock Text="What Setup Can Configure" FontSize="15" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="Workstation → branch-server capable" HorizontalAlignment="Right" Foreground="#82909A" FontSize="10"/>
+                                                </Grid>
+
+                                                <Border BorderBrush="#D9E2E6" BorderThickness="1" CornerRadius="9" Padding="10" Margin="0,4">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="34"/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="✓" Foreground="#34852E" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                        <StackPanel Grid.Column="1">
+                                                            <TextBlock Text="The Link Windows application" FontWeight="SemiBold"/>
+                                                            <TextBlock Text="Desktop app, shortcuts, protocol handlers and uninstaller." Foreground="#82909A" FontSize="10"/>
+                                                        </StackPanel>
+                                                        <Border Grid.Column="2" Background="#E8F8E5" CornerRadius="10" Padding="8,4">
+                                                            <TextBlock Text="Core" Foreground="#34852E" FontSize="9" FontWeight="Bold"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+
+                                                <Border BorderBrush="#D9E2E6" BorderThickness="1" CornerRadius="9" Padding="10" Margin="0,4">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="34"/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="✓" Foreground="#34852E" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                        <StackPanel Grid.Column="1">
+                                                            <TextBlock Text="Local SQLite data layer" FontWeight="SemiBold"/>
+                                                            <TextBlock Text="Created automatically for approved offline/cache use; no separate database server installation." Foreground="#82909A" FontSize="10"/>
+                                                        </StackPanel>
+                                                        <Border Grid.Column="2" Background="#E8F8E5" CornerRadius="10" Padding="8,4">
+                                                            <TextBlock Text="Recommended" Foreground="#34852E" FontSize="9" FontWeight="Bold"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+
+                                                <Border BorderBrush="#D9E2E6" BorderThickness="1" CornerRadius="9" Padding="10" Margin="0,4">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="34"/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="DB" Foreground="#3D6C9F" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                        <StackPanel Grid.Column="1">
+                                                            <TextBlock Text="Optional PostgreSQL branch/server mode" FontWeight="SemiBold"/>
+                                                            <TextBlock Text="Advanced deployment only: detect existing PostgreSQL, connect to an approved server, or install a supported local package." Foreground="#82909A" FontSize="10"/>
+                                                        </StackPanel>
+                                                        <Border Grid.Column="2" Background="#EAF2FB" CornerRadius="10" Padding="8,4">
+                                                            <TextBlock Text="Advanced" Foreground="#3D6C9F" FontSize="9" FontWeight="Bold"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+
+                                                <Border BorderBrush="#D9E2E6" BorderThickness="1" CornerRadius="9" Padding="10" Margin="0,4">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="34"/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="▦" Foreground="#3D6C9F" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                        <StackPanel Grid.Column="1">
+                                                            <TextBlock Text="Device bridge and background services" FontWeight="SemiBold"/>
+                                                            <TextBlock Text="Printers, scanners, scales and other approved workstation peripherals." Foreground="#82909A" FontSize="10"/>
+                                                        </StackPanel>
+                                                        <Border Grid.Column="2" Background="#EAF2FB" CornerRadius="10" Padding="8,4">
+                                                            <TextBlock Text="Optional" Foreground="#3D6C9F" FontSize="9" FontWeight="Bold"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Background="#EDF5FC" BorderBrush="#C8DBED" BorderThickness="1" CornerRadius="9" Padding="12" Margin="0,8,0,0">
+                                            <TextBlock TextWrapping="Wrap" Foreground="#3F668D" FontSize="11">
+                                                <Run Text="Production cloud database rule: " FontWeight="Bold"/>
+                                                <Run Text="normal Windows clients connect to the configured Supabase/PostgreSQL backend through The Link application. The desktop installer does not run production DDL migrations or store a Supabase service_role secret."/>
+                                            </TextBlock>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <TabItem>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="System Compatibility Check" FontSize="27" FontWeight="Bold"/>
+                                                <TextBlock Text="Setup validates Windows, architecture, disk, permissions, networking and existing database/runtime components before writing files."
+                                                           FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,6,20,0"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Background="#EAF8E7" CornerRadius="12" Padding="9,5" VerticalAlignment="Top">
+                                                <TextBlock Text="Step 2 of 12" Foreground="#34852E" FontWeight="SemiBold" FontSize="10"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <ItemsControl ItemsSource="{Binding SystemChecks}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border BorderBrush="#D9E2E6" BorderThickness="1" CornerRadius="9" Padding="9" Margin="0,3" Background="White">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="38"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <Border Width="28" Height="28" CornerRadius="14" Background="#EDF2F4" HorizontalAlignment="Left">
+                                                                <TextBlock Text="{Binding Icon}" FontSize="9" FontWeight="Bold" Foreground="#5D6D77"
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                            <StackPanel Grid.Column="1">
+                                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="11"/>
+                                                                <TextBlock Text="{Binding Detail}" Foreground="#82909A" FontSize="10" TextWrapping="Wrap" Margin="0,2,12,0"/>
+                                                            </StackPanel>
+                                                            <Border Grid.Column="2" Style="{StaticResource StatusPillStyle}" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Badge}" FontWeight="Bold" FontSize="9"/>
+                                                            </Border>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <Border CornerRadius="9" Padding="12" Margin="0,10,0,0">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#EEF8EB"/>
+                                                    <Setter Property="BorderBrush" Value="#C9E8C0"/>
+                                                    <Setter Property="BorderThickness" Value="1"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasBlockingChecks}" Value="True">
+                                                            <Setter Property="Background" Value="#FFF0EF"/>
+                                                            <Setter Property="BorderBrush" Value="#EFC1BE"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding SystemCheckSummary}" TextWrapping="Wrap" FontSize="11"/>
+                                                <Button Grid.Column="1" Content="Run checks again" Margin="12,0,0,0"
+                                                        Style="{StaticResource BaseButtonStyle}" Click="RefreshSystemChecks_Click"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <TabItem>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Choose Installation Type" FontSize="27" FontWeight="Bold"/>
+                                                <TextBlock Text="The workstation profile changes local components and device-service defaults. It does not grant application privileges."
+                                                           FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,6,20,0"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Background="#EAF8E7" CornerRadius="12" Padding="9,5" VerticalAlignment="Top">
+                                                <TextBlock Text="Step 3 of 12" Foreground="#34852E" FontWeight="SemiBold" FontSize="10"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <UniformGrid Columns="2" Margin="-5">
+                                            <Border Style="{StaticResource CardStyle}" Margin="5">
+                                                <RadioButton GroupName="InstallProfile" Tag="Standard Workstation" IsChecked="True" Checked="Profile_Checked">
+                                                    <StackPanel Margin="6">
+                                                        <TextBlock Text="Standard Workstation" FontSize="14" FontWeight="SemiBold"/>
+                                                        <TextBlock Text="Recommended for ordinary office/admin use. Cloud backend + local SQLite cache."
+                                                                   Foreground="#7B8992" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                                    </StackPanel>
+                                                </RadioButton>
+                                            </Border>
+
+                                            <Border Style="{StaticResource CardStyle}" Margin="5">
+                                                <RadioButton GroupName="InstallProfile" Tag="POS / Sharing Point" Checked="Profile_Checked">
+                                                    <StackPanel Margin="6">
+                                                        <TextBlock Text="POS / Sharing Point" FontSize="14" FontWeight="SemiBold"/>
+                                                        <TextBlock Text="Includes device bridge defaults for printers, scanners, scales and payment integration."
+                                                                   Foreground="#7B8992" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                                    </StackPanel>
+                                                </RadioButton>
+                                            </Border>
+
+                                            <Border Style="{StaticResource CardStyle}" Margin="5">
+                                                <RadioButton GroupName="InstallProfile" Tag="Back-Office / Admin" Checked="Profile_Checked">
+                                                    <StackPanel Margin="6">
+                                                        <TextBlock Text="Back-Office / Admin" FontSize="14" FontWeight="SemiBold"/>
+                                                        <TextBlock Text="Finance, stock, HR and reporting with minimal device services."
+                                                                   Foreground="#7B8992" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                                    </StackPanel>
+                                                </RadioButton>
+                                            </Border>
+
+                                            <Border Style="{StaticResource CardStyle}" Margin="5">
+                                                <RadioButton GroupName="InstallProfile" Tag="Branch Server / Advanced" Checked="Profile_Checked">
+                                                    <StackPanel Margin="6">
+                                                        <TextBlock Text="Branch Server / Advanced" FontSize="14" FontWeight="SemiBold"/>
+                                                        <TextBlock Text="Advanced profile that can host an approved local PostgreSQL database/service if the deployment architecture requires it."
+                                                                   Foreground="#7B8992" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                                    </StackPanel>
+                                                </RadioButton>
+                                            </Border>
+                                        </UniformGrid>
+
+                                        <Border Background="#FFF7E6" BorderBrush="#ECD18E" BorderThickness="1" CornerRadius="9" Padding="12" Margin="0,10,0,0">
+                                            <TextBlock Text="A Branch Server profile should only be selected when the organisation's deployment plan explicitly requires a local PostgreSQL service. It is not the normal workstation default."
+                                                       TextWrapping="Wrap" Foreground="#73561C" FontSize="11"/>
+                                        </Border>
+
+                                        <Border Background="#EDF5FC" BorderBrush="#C8DBED" BorderThickness="1" CornerRadius="9" Padding="12" Margin="0,10,0,0">
+                                            <TextBlock FontSize="11">
+                                                <Run Text="Selected profile: " FontWeight="Bold"/>
+                                                <Run Text="{Binding SelectedInstallProfile}"/>
+                                            </TextBlock>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <TabItem>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Components" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="LWI-P3+ implementation boundary" Foreground="{StaticResource MutedBrush}" Margin="0,8"/>
+                                    <TextBlock Text="The installer shell is ready. Component selection will be implemented in its scheduled phase."
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem><TextBlock Text="Database / SQL — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/></TabItem>
+                            <TabItem><TextBlock Text="Install Location — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/></TabItem>
+                            <TabItem><TextBlock Text="Device &amp; Services — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/></TabItem>
+                            <TabItem><TextBlock Text="Network &amp; Security — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/></TabItem>
+                            <TabItem><TextBlock Text="Updates &amp; Privacy — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/></TabItem>
+                            <TabItem><TextBlock Text="Review — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/></TabItem>
+                            <TabItem><TextBlock Text="Installing — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/></TabItem>
+                            <TabItem><TextBlock Text="Complete — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/></TabItem>
+                        </TabControl>
+
+                        <Border Grid.Row="1" BorderBrush="#D7E0E4" BorderThickness="0,1,0,0" Background="White">
+                            <Grid Margin="22,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding FooterStatus}" Foreground="#7B8992" FontSize="11"/>
+                                    <TextBlock Text="{Binding LogPath, StringFormat=Setup log: {0}}" Foreground="#A0ADB4" FontSize="9" Margin="0,3,0,0"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="Cancel" Style="{StaticResource BaseButtonStyle}" Click="Cancel_Click" Margin="0,0,8,0"/>
+                                    <Button Content="Back" Style="{StaticResource BaseButtonStyle}" Click="Back_Click"
+                                            IsEnabled="{Binding CanBack}" Margin="0,0,8,0"/>
+                                    <Button Content="Next" Style="{StaticResource PrimaryButtonStyle}" Click="Next_Click"
+                                            IsEnabled="{Binding CanNext}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
