@@ -13,6 +13,9 @@ public sealed class WindowsSystemProbe
         var isWindows = OperatingSystem.IsWindows();
         var build = isWindows ? Environment.OSVersion.Version.Build : 0;
         var architecture = RuntimeInformation.OSArchitecture.ToString();
+        var postgres = isWindows
+            ? DetectPostgreSql()
+            : (false, "PostgreSQL detection is available on Windows only.");
 
         return new SystemSnapshot(
             isWindows,
@@ -23,8 +26,8 @@ public sealed class WindowsSystemProbe
             isWindows ? GetPhysicalMemoryBytes() : 0,
             NetworkInterface.GetIsNetworkAvailable(),
             isWindows && IsAdministrator(),
-            isWindows && DetectPostgreSql().Found,
-            isWindows ? DetectPostgreSql().Description : "PostgreSQL detection is available on Windows only.");
+            postgres.Item1,
+            postgres.Item2);
     }
 
     private static string GetWindowsName(bool isWindows, int build)
@@ -55,7 +58,10 @@ public sealed class WindowsSystemProbe
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
             return string.IsNullOrWhiteSpace(root) ? 0 : new DriveInfo(root).AvailableFreeSpace;
         }
-        catch { return 0; }
+        catch
+        {
+            return 0;
+        }
     }
 
     private static bool IsAdministrator()
@@ -65,7 +71,10 @@ public sealed class WindowsSystemProbe
             using var identity = WindowsIdentity.GetCurrent();
             return new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
         }
-        catch { return false; }
+        catch
+        {
+            return false;
+        }
     }
 
     private static (bool Found, string Description) DetectPostgreSql()
@@ -83,12 +92,16 @@ public sealed class WindowsSystemProbe
                     using var installation = installations.OpenSubKey(installationName);
                     var version = installation?.GetValue("Version")?.ToString();
                     var baseDirectory = installation?.GetValue("Base Directory")?.ToString();
+
                     return (true, string.IsNullOrWhiteSpace(baseDirectory)
                         ? $"PostgreSQL {version ?? "installation"} detected."
                         : $"PostgreSQL {version ?? "installation"} detected at {baseDirectory}.");
                 }
             }
-            catch { }
+            catch
+            {
+                // Registry detection is best-effort; standard workstations may have no PostgreSQL.
+            }
         }
 
         try
@@ -109,13 +122,19 @@ public sealed class WindowsSystemProbe
                     return (true, $"PostgreSQL installation folder detected ({string.Join(", ", versions)}).");
             }
         }
-        catch { }
+        catch
+        {
+            // Absence or inaccessible install metadata is a valid standard-workstation state.
+        }
 
         return (false, "No local PostgreSQL installation detected.");
     }
 
     private static string? ReadRegistryString(
-        RegistryHive hive, RegistryView view, string keyPath, string valueName)
+        RegistryHive hive,
+        RegistryView view,
+        string keyPath,
+        string valueName)
     {
         try
         {
@@ -123,7 +142,10 @@ public sealed class WindowsSystemProbe
             using var key = baseKey.OpenSubKey(keyPath);
             return key?.GetValue(valueName)?.ToString();
         }
-        catch { return null; }
+        catch
+        {
+            return null;
+        }
     }
 
     private static long GetPhysicalMemoryBytes()
