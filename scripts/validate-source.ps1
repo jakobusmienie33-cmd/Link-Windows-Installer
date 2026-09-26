@@ -36,20 +36,23 @@ foreach ($relative in $required) {
   }
 }
 
-$legacyAttribution = "Built" + "@" + "Home"
-$legacy = Get-ChildItem $root -Recurse -File |
+$sourceFiles = Get-ChildItem $root -Recurse -File |
   Where-Object {
-    $_.FullName -notmatch "\(bin|obj|.git)\" -and
-    $_.FullName -ne $PSCommandPath
-  } |
+    $_.FullName -notlike '*\bin\*' -and
+    $_.FullName -notlike '*\obj\*' -and
+    $_.FullName -notlike '*\.git\*'
+  }
+
+$legacyAttribution = "Built" + "@" + "Home"
+$legacy = $sourceFiles |
+  Where-Object { $_.FullName -ne $PSCommandPath } |
   Select-String -SimpleMatch $legacyAttribution -ErrorAction SilentlyContinue
 
 if ($legacy) {
   throw "Legacy installer attribution found. Use 'By MeetWell Technologies'."
 }
 
-$branding = Get-ChildItem $root -Recurse -File |
-  Where-Object { $_.FullName -notmatch "\(bin|obj|.git)\" } |
+$branding = $sourceFiles |
   Select-String -SimpleMatch "By MeetWell Technologies" -ErrorAction SilentlyContinue
 
 if (-not $branding) {
