@@ -1,3 +1,4 @@
+using System.IO;
 namespace Link.Windows.Installer.Services;
 
 public sealed class SetupLogger
