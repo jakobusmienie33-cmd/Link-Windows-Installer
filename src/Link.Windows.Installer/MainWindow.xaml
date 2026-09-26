@@ -426,7 +426,7 @@
                                                 <TextBlock Text="{Binding DatabasePlanTitle}" FontSize="14" FontWeight="SemiBold"/>
                                                 <TextBlock Text="{Binding DatabasePlanSummary}" FontSize="10" Foreground="#82909A" TextWrapping="Wrap" Margin="0,3,0,8"/>
                                                 <ItemsControl ItemsSource="{Binding DatabasePlanSteps}">
-                                                    <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding StringFormat=• {0}}" FontSize="10" TextWrapping="Wrap" Margin="0,2"/></DataTemplate></ItemsControl.ItemTemplate>
+                                                    <ItemsControl.ItemTemplate><DataTemplate><TextBlock FontSize="10" TextWrapping="Wrap" Margin="0,2"><Run Text="• "/><Run Text="{Binding}"/></TextBlock></DataTemplate></ItemsControl.ItemTemplate>
                                                 </ItemsControl>
                                             </StackPanel>
                                         </Border>
@@ -435,7 +435,7 @@
                                             <StackPanel>
                                                 <TextBlock Text="Security / bootstrap contract" FontWeight="SemiBold" Foreground="#73561C"/>
                                                 <ItemsControl ItemsSource="{Binding DatabaseSecurityControls}">
-                                                    <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding StringFormat=• {0}}" TextWrapping="Wrap" Foreground="#73561C" FontSize="9.5" Margin="0,2"/></DataTemplate></ItemsControl.ItemTemplate>
+                                                    <ItemsControl.ItemTemplate><DataTemplate><TextBlock TextWrapping="Wrap" Foreground="#73561C" FontSize="9.5" Margin="0,2"><Run Text="• "/><Run Text="{Binding}"/></TextBlock></DataTemplate></ItemsControl.ItemTemplate>
                                                 </ItemsControl>
                                             </StackPanel>
                                         </Border>
