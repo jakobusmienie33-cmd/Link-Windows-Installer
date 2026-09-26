@@ -96,7 +96,7 @@
                                 <Border Height="1" Background="#40545D" Margin="0,8,0,10"/>
                                 <TextBlock Text="By MeetWell Technologies" FontWeight="SemiBold" Foreground="#D2DEE3" FontSize="10"/>
                                 <TextBlock Text="Signed packages • least privilege • auditable setup" Foreground="#8EA0A8" FontSize="9" Margin="0,3,0,0"/>
-                                <TextBlock Text="Installer source • v0.7.0-dev" Foreground="#8EA0A8" FontSize="9"/>
+                                <TextBlock Text="Installer source • v1.0.0-rc1" Foreground="#8EA0A8" FontSize="9"/>
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -500,12 +500,240 @@
                                 </ScrollViewer>
                             </TabItem>
 
-                            <TabItem><TextBlock Text="Device &amp; Services — LWI-P8+ implementation boundary" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Foreground="{StaticResource MutedBrush}"/></TabItem>
-                            <TabItem><TextBlock Text="Network &amp; Security — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="{StaticResource MutedBrush}"/></TabItem>
-                            <TabItem><TextBlock Text="Updates &amp; Privacy — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="{StaticResource MutedBrush}"/></TabItem>
-                            <TabItem><TextBlock Text="Review — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="{StaticResource MutedBrush}"/></TabItem>
-                            <TabItem><TextBlock Text="Installing — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="{StaticResource MutedBrush}"/></TabItem>
-                            <TabItem><TextBlock Text="Complete — planned" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="{StaticResource MutedBrush}"/></TabItem>
+                            <!-- Step 7: Device & Services -->
+                            <TabItem>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Device &amp; Local Services" FontSize="27" FontWeight="Bold"/>
+                                                <TextBlock Text="Configure workstation identity and the local service components that The Link may register during deployment."
+                                                           FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,6,20,0"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Background="#EAF8E7" CornerRadius="12" Padding="9,5" VerticalAlignment="Top">
+                                                <TextBlock Text="Step 7 of 12" Foreground="#34852E" FontWeight="SemiBold" FontSize="10"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <Border Style="{StaticResource CardStyle}">
+                                            <StackPanel>
+                                                <TextBlock Text="Device display name" FontSize="9" FontWeight="SemiBold" Foreground="#677781" Margin="0,0,0,4"/>
+                                                <TextBox Text="{Binding DeviceDisplayName, UpdateSourceTrigger=PropertyChanged}" Padding="8"/>
+                                                <TextBlock Text="Workstation purpose" FontSize="9" FontWeight="SemiBold" Foreground="#677781" Margin="0,10,0,4"/>
+                                                <ComboBox Text="{Binding WorkstationPurpose, UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Padding="6">
+                                                    <ComboBoxItem Content="Resolve after sign-in"/>
+                                                    <ComboBoxItem Content="POS / Sharing Point"/>
+                                                    <ComboBoxItem Content="Back Office"/>
+                                                    <ComboBoxItem Content="Manager Station"/>
+                                                    <ComboBoxItem Content="Branch Server"/>
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Style="{StaticResource CardStyle}">
+                                            <StackPanel>
+                                                <TextBlock Text="Local components" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                                <CheckBox Content="The Link Device Bridge" IsChecked="{Binding EnableDeviceBridge}" Margin="0,4"/>
+                                                <CheckBox Content="The Link Sync Service" IsChecked="{Binding EnableSyncService}" Margin="0,4"/>
+                                                <CheckBox Content="The Link Updater" IsChecked="{Binding EnableUpdater}" Margin="0,4"/>
+                                                <CheckBox Content="The Link Diagnostics service" IsChecked="{Binding EnableDiagnostics}" Margin="0,4"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Background="#EDF5FC" BorderBrush="#C8DBED" BorderThickness="1" CornerRadius="9" Padding="12">
+                                            <TextBlock Text="Service registration is manifest/component driven. Setup does not invent service binaries: a service is registered only when its signed executable is present in the staged release payload." TextWrapping="Wrap" Foreground="#3F668D" FontSize="11"/>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Step 8: Network & Security -->
+                            <TabItem>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Network, Firewall &amp; Security" FontSize="27" FontWeight="Bold"/>
+                                                <TextBlock Text="The standard workstation uses outbound HTTPS/WSS and keeps inbound surfaces closed unless an approved local service explicitly requires one."
+                                                           FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,6,20,0"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Background="#EAF8E7" CornerRadius="12" Padding="9,5" VerticalAlignment="Top">
+                                                <TextBlock Text="Step 8 of 12" Foreground="#34852E" FontWeight="SemiBold" FontSize="10"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <UniformGrid Columns="2" Margin="-5">
+                                            <Border Style="{StaticResource CardStyle}" Margin="5">
+                                                <StackPanel>
+                                                    <TextBlock Text="Outbound connectivity" FontSize="14" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="• Link / Supabase API: HTTPS/WSS" Margin="0,8,0,2"/>
+                                                    <TextBlock Text="• Signed update endpoint: HTTPS" Margin="0,2"/>
+                                                    <TextBlock Text="• Diagnostics: HTTPS when enabled/policy permits" Margin="0,2"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Style="{StaticResource CardStyle}" Margin="5">
+                                                <StackPanel>
+                                                    <TextBlock Text="Inbound baseline" FontSize="14" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="• Normal workstation: no general inbound listener" Margin="0,8,0,2"/>
+                                                    <TextBlock Text="• Device bridge: localhost/scoped subnet only when required" Margin="0,2"/>
+                                                    <TextBlock Text="• PostgreSQL: localhost unless Branch Server is explicitly configured" Margin="0,2"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </UniformGrid>
+
+                                        <Border Style="{StaticResource CardStyle}">
+                                            <StackPanel>
+                                                <TextBlock Text="Security baseline" FontSize="14" FontWeight="SemiBold"/>
+                                                <TextBlock Text="✓ Release payload SHA-256 validation before deployment" Margin="0,8,0,2"/>
+                                                <TextBlock Text="✓ Transactional application checkpoint / rollback" Margin="0,2"/>
+                                                <TextBlock Text="✓ Runtime database secrets use Windows Credential Manager" Margin="0,2"/>
+                                                <TextBlock Text="✓ Production Supabase service_role secrets are forbidden" Margin="0,2"/>
+                                                <TextBlock Text="✓ Production cloud DDL is not executed by workstation setup" Margin="0,2"/>
+                                                <TextBlock Text="✓ Installer logs exclude passwords, PINs and payment secrets" Margin="0,2"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Step 9: Updates & Privacy -->
+                            <TabItem>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Updates, Privacy &amp; Diagnostics" FontSize="27" FontWeight="Bold"/>
+                                                <TextBlock Text="Choose client-safe update and diagnostic defaults. Organisation policy can further restrict these settings after sign-in."
+                                                           FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,6,20,0"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Background="#EAF8E7" CornerRadius="12" Padding="9,5" VerticalAlignment="Top">
+                                                <TextBlock Text="Step 9 of 12" Foreground="#34852E" FontWeight="SemiBold" FontSize="10"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <Border Style="{StaticResource CardStyle}">
+                                            <StackPanel>
+                                                <TextBlock Text="Update channel" FontSize="9" FontWeight="SemiBold" Foreground="#677781" Margin="0,0,0,4"/>
+                                                <ComboBox Text="{Binding UpdateChannel, UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Padding="6">
+                                                    <ComboBoxItem Content="Stable"/>
+                                                    <ComboBoxItem Content="Preview / Test"/>
+                                                    <ComboBoxItem Content="Organisation-managed"/>
+                                                </ComboBox>
+                                                <CheckBox Content="Create Start Menu shortcut" IsChecked="{Binding CreateStartMenuShortcut}" Margin="0,12,0,4"/>
+                                                <CheckBox Content="Create desktop shortcut" IsChecked="{Binding CreateDesktopShortcut}" Margin="0,4"/>
+                                                <CheckBox Content="Start The Link with Windows" IsChecked="{Binding RunAtStartup}" Margin="0,4"/>
+                                                <CheckBox Content="Allow sanitised diagnostics (subject to organisation policy)" IsChecked="{Binding DiagnosticsEnabled}" Margin="0,12,0,4"/>
+                                                <CheckBox Content="Enable sanitised crash reporting" IsChecked="{Binding CrashReportingEnabled}" Margin="0,4"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Background="#FFF7E6" BorderBrush="#ECD18E" BorderThickness="1" CornerRadius="9" Padding="12">
+                                            <TextBlock Text="Passwords, PINs, database administrator secrets, payment secrets and production service-role keys are never diagnostic payload fields." TextWrapping="Wrap" Foreground="#73561C" FontSize="11"/>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Step 10: Review -->
+                            <TabItem>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Ready to Install" FontSize="27" FontWeight="Bold"/>
+                                                <TextBlock Text="Review the selected setup plan and verify the staged Link-Core release before Windows files or installer state are changed."
+                                                           FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,6,20,0"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Background="#EAF8E7" CornerRadius="12" Padding="9,5" VerticalAlignment="Top">
+                                                <TextBlock Text="Step 10 of 12" Foreground="#34852E" FontWeight="SemiBold" FontSize="10"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <Border Style="{StaticResource CardStyle}">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,8">
+                                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding ReleaseSummary}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                                        <TextBlock Text="{Binding DeploymentMode, StringFormat=Deployment mode: {0}}" Foreground="#82909A" FontSize="10" Margin="0,3,0,0"/>
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1" Content="Refresh review" Style="{StaticResource BaseButtonStyle}" Click="RefreshReview_Click"/>
+                                                </Grid>
+                                                <ItemsControl ItemsSource="{Binding ReviewItems}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock TextWrapping="Wrap" FontSize="10" Margin="0,3"><Run Text="• "/><Run Text="{Binding}"/></TextBlock>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Background="#EEF8EB" BorderBrush="#C9E8C0" BorderThickness="1" CornerRadius="9" Padding="12">
+                                            <TextBlock Text="Install is enabled only after the staged release manifest and every required file pass product, version, path, size and SHA-256 validation." TextWrapping="Wrap" Foreground="#32682E" FontSize="11"/>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Step 11: Installing -->
+                            <TabItem>
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Installing The Link" FontSize="27" FontWeight="Bold"/>
+                                            <TextBlock Text="Setup is applying the verified release transactionally and will roll application files back if deployment fails."
+                                                       FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" Margin="0,6,20,0"/>
+                                        </StackPanel>
+                                        <Border Grid.Column="1" Background="#EAF8E7" CornerRadius="12" Padding="9,5" VerticalAlignment="Top">
+                                            <TextBlock Text="Step 11 of 12" Foreground="#34852E" FontWeight="SemiBold" FontSize="10"/>
+                                        </Border>
+                                    </Grid>
+                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding InstallProgress}" Height="14" Margin="0,8,0,8"/>
+                                    <TextBlock Text="{Binding InstallStatus}" FontSize="11" Foreground="#5D6D77" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                                    <Border Background="#111D24" CornerRadius="10" Padding="12" Height="330">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{Binding InstallLog}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" Foreground="#DCE7EC" FontFamily="Consolas" FontSize="10" TextWrapping="Wrap" Margin="0,2"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </Border>
+                                </StackPanel>
+                            </TabItem>
+
+                            <!-- Step 12: Complete -->
+                            <TabItem>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel HorizontalAlignment="Center" MaxWidth="760" Margin="20">
+                                        <Border Width="82" Height="82" CornerRadius="41" Background="#3FCA40" HorizontalAlignment="Center">
+                                            <TextBlock Text="✓" Foreground="#143018" FontSize="42" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="The Link is ready" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,18,0,6"/>
+                                        <TextBlock Text="{Binding CompleteSummary}" TextWrapping="Wrap" TextAlignment="Center" Foreground="#77868F" FontSize="11"/>
+                                        <Border Style="{StaticResource CardStyle}" Margin="0,20,0,0">
+                                            <StackPanel>
+                                                <TextBlock Text="Post-install validation" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                                <TextBlock Text="✓ Application entry point exists" Margin="0,3"/>
+                                                <TextBlock Text="✓ Client-safe runtime configuration persisted" Margin="0,3"/>
+                                                <TextBlock Text="✓ Installer state/version persisted" Margin="0,3"/>
+                                                <TextBlock Text="✓ Windows shortcuts/uninstall metadata applied as selected" Margin="0,3"/>
+                                                <TextBlock Text="✓ Upgrade/repair checkpoint architecture active" Margin="0,3"/>
+                                                <TextBlock Text="✓ Normal uninstall preserves local business/cache data by default" Margin="0,3"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <TextBlock Text="By MeetWell Technologies" HorizontalAlignment="Center" Foreground="#71808A" FontWeight="SemiBold" Margin="0,18,0,0"/>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
                         </TabControl>
 
                         <Border Grid.Row="1" BorderBrush="#D7E0E4" BorderThickness="0,1,0,0" Background="White">
@@ -518,7 +746,7 @@
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                     <Button Content="Cancel" Style="{StaticResource BaseButtonStyle}" Click="Cancel_Click" Margin="0,0,8,0"/>
                                     <Button Content="Back" Style="{StaticResource BaseButtonStyle}" Click="Back_Click" IsEnabled="{Binding CanBack}" Margin="0,0,8,0"/>
-                                    <Button Content="Next" Style="{StaticResource PrimaryButtonStyle}" Click="Next_Click" IsEnabled="{Binding CanNext}"/>
+                                    <Button Content="{Binding NextButtonText}" Style="{StaticResource PrimaryButtonStyle}" Click="Next_Click" IsEnabled="{Binding CanNext}"/>
                                 </StackPanel>
                             </Grid>
                         </Border>

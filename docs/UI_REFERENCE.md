@@ -1,47 +1,9 @@
 # Canonical Windows Installer UI Reference
 
-The canonical reference is:
+The canonical design source is `the_link_windows_installer_comprehensive_mockup.html`.
 
-`the_link_windows_installer_comprehensive_mockup.html`
+The production WPF implementation now contains the complete 12-step flow: Welcome, System Check, Install Type, Components, Database / SQL, Install Location, Device & Services, Network & Security, Updates & Privacy, Review, Installing and Complete.
 
-## Required visual language
+The implementation preserves the dark Link header/sidebar, green accent/status language, white card workspace, progress rail, guided notices, Back/Next/Cancel footer and **By MeetWell Technologies** attribution.
 
-Production WPF screens retain:
-- dark The Link top system bar,
-- dark left 12-step progress rail,
-- The Link green accent/status language,
-- white cards on the soft grey workspace,
-- compact status pills/notices,
-- Back / Next / Cancel footer controls,
-- guided explanations suitable for the Finn Test,
-- **By MeetWell Technologies** attribution.
-
-## Implemented HTML-matched screens
-
-### Step 1 — Welcome
-Core application, local SQLite, optional branch PostgreSQL and device-service explanation.
-
-### Step 2 — System Check
-Live Windows compatibility checks rather than static sample values.
-
-### Step 3 — Install Type
-Standard Workstation, POS / Sharing Point, Back-Office / Admin and Branch Server / Advanced.
-
-### Step 4 — Components
-Component cards plus a live prerequisite inventory and signed-payload remediation state.
-
-### Step 5 — Database / SQL
-Four canonical database modes:
-- Cloud Supabase + Local SQLite,
-- Existing PostgreSQL,
-- Install Local PostgreSQL,
-- SQLite-only/offline preparation.
-
-The production screen adds real discovery, endpoint tests, PostgreSQL authenticated self-test support and security-plan preview.
-
-### Step 6 — Install Location
-Canonical application/data/cache/log paths plus backup/checkpoint path, install scope and live layout validation.
-
-## UI rule
-
-HTML is the design reference; WPF is the production implementation. Behaviour must be backed by installer services rather than simulated HTML-only state.
+HTML remains the design reference; WPF is the executable implementation. Static HTML simulation is never treated as installation logic.

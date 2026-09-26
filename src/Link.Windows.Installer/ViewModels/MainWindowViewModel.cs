@@ -20,6 +20,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private readonly DatabaseBootstrapPlanner _bootstrapPlanner;
     private readonly DatabaseConnectivityService _connectivity;
     private readonly WindowsCredentialStore _credentialStore;
+    private readonly InstallationEngine _installationEngine;
     private readonly SetupLogger _logger;
 
     private int _currentStepIndex;
@@ -53,6 +54,28 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private string _pathValidationSummary = "Installation paths have not been validated.";
     private bool _hasPathErrors;
 
+    private string _deviceDisplayName = Environment.MachineName;
+    private string _workstationPurpose = "Resolve after sign-in";
+    private bool _enableDeviceBridge = true;
+    private bool _enableSyncService = true;
+    private bool _enableUpdater = true;
+    private bool _enableDiagnostics;
+
+    private bool _createStartMenuShortcut = true;
+    private bool _createDesktopShortcut = true;
+    private bool _runAtStartup;
+    private string _updateChannel = "Stable";
+    private bool _diagnosticsEnabled;
+    private bool _crashReportingEnabled = true;
+
+    private bool _releaseReady;
+    private string _releaseSummary = "Release payload has not been validated.";
+    private string _deploymentMode = "Pending";
+    private bool _isInstalling;
+    private int _installProgress;
+    private string _installStatus = "Waiting to start…";
+    private string _completeSummary = "Installation has not run yet.";
+
     public MainWindowViewModel(
         WindowsSystemProbe probe,
         SystemCompatibilityEvaluator systemEvaluator,
@@ -64,6 +87,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         DatabaseBootstrapPlanner bootstrapPlanner,
         DatabaseConnectivityService connectivity,
         WindowsCredentialStore credentialStore,
+        InstallationEngine installationEngine,
         SetupLogger logger)
     {
         _probe = probe;
@@ -76,6 +100,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         _bootstrapPlanner = bootstrapPlanner;
         _connectivity = connectivity;
         _credentialStore = credentialStore;
+        _installationEngine = installationEngine;
         _logger = logger;
 
         Steps = new ObservableCollection<InstallerStep>(
@@ -107,6 +132,8 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public ObservableCollection<string> DatabasePlanSteps { get; } = new();
     public ObservableCollection<string> DatabaseSecurityControls { get; } = new();
     public ObservableCollection<string> PathMessages { get; } = new();
+    public ObservableCollection<string> ReviewItems { get; } = new();
+    public ObservableCollection<string> InstallLog { get; } = new();
 
     public int CurrentStepIndex
     {
@@ -119,6 +146,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(FooterStatus));
             OnPropertyChanged(nameof(CanBack));
             OnPropertyChanged(nameof(CanNext));
+            OnPropertyChanged(nameof(NextButtonText));
             UpdateStepStates();
         }
     }
@@ -129,11 +157,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         private set => SetField(ref _selectedInstallProfile, value);
     }
 
-    public string SystemCheckSummary
-    {
-        get => _systemCheckSummary;
-        private set => SetField(ref _systemCheckSummary, value);
-    }
+    public string SystemCheckSummary { get => _systemCheckSummary; private set => SetField(ref _systemCheckSummary, value); }
 
     public bool HasBlockingChecks
     {
@@ -145,17 +169,8 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public string PrerequisiteSummary
-    {
-        get => _prerequisiteSummary;
-        private set => SetField(ref _prerequisiteSummary, value);
-    }
-
-    public bool HasBlockingPrerequisites
-    {
-        get => _hasBlockingPrerequisites;
-        private set => SetField(ref _hasBlockingPrerequisites, value);
-    }
+    public string PrerequisiteSummary { get => _prerequisiteSummary; private set => SetField(ref _prerequisiteSummary, value); }
+    public bool HasBlockingPrerequisites { get => _hasBlockingPrerequisites; private set => SetField(ref _hasBlockingPrerequisites, value); }
 
     public PostgreSqlInstance? SelectedPostgreSql
     {
@@ -169,11 +184,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public string PostgreSqlSummary
-    {
-        get => _postgreSqlSummary;
-        private set => SetField(ref _postgreSqlSummary, value);
-    }
+    public string PostgreSqlSummary { get => _postgreSqlSummary; private set => SetField(ref _postgreSqlSummary, value); }
 
     public DatabaseMode SelectedDatabaseMode
     {
@@ -195,115 +206,22 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         _ => SelectedDatabaseMode.ToString()
     };
 
-    public string BackendUrl
-    {
-        get => _backendUrl;
-        set
-        {
-            if (SetField(ref _backendUrl, value))
-                RefreshDatabasePlan();
-        }
-    }
+    public string BackendUrl { get => _backendUrl; set { if (SetField(ref _backendUrl, value)) RefreshDatabasePlan(); } }
+    public string DatabaseHost { get => _databaseHost; set { if (SetField(ref _databaseHost, value)) RefreshDatabasePlan(); } }
+    public string DatabasePort { get => _databasePort; set { if (SetField(ref _databasePort, value)) RefreshDatabasePlan(); } }
+    public string DatabaseName { get => _databaseName; set { if (SetField(ref _databaseName, value)) RefreshDatabasePlan(); } }
+    public string DatabaseUser { get => _databaseUser; set { if (SetField(ref _databaseUser, value)) RefreshDatabasePlan(); } }
+    public string DatabasePlanTitle { get => _databasePlanTitle; private set => SetField(ref _databasePlanTitle, value); }
+    public string DatabasePlanSummary { get => _databasePlanSummary; private set => SetField(ref _databasePlanSummary, value); }
+    public string DatabaseValidationSummary { get => _databaseValidationSummary; private set => SetField(ref _databaseValidationSummary, value); }
+    public DatabaseValidationState DatabaseValidationState { get => _databaseValidationState; private set => SetField(ref _databaseValidationState, value); }
+    public string CredentialReference { get => _credentialReference; private set => SetField(ref _credentialReference, value); }
 
-    public string DatabaseHost
-    {
-        get => _databaseHost;
-        set
-        {
-            if (SetField(ref _databaseHost, value))
-                RefreshDatabasePlan();
-        }
-    }
-
-    public string DatabasePort
-    {
-        get => _databasePort;
-        set
-        {
-            if (SetField(ref _databasePort, value))
-                RefreshDatabasePlan();
-        }
-    }
-
-    public string DatabaseName
-    {
-        get => _databaseName;
-        set
-        {
-            if (SetField(ref _databaseName, value))
-                RefreshDatabasePlan();
-        }
-    }
-
-    public string DatabaseUser
-    {
-        get => _databaseUser;
-        set
-        {
-            if (SetField(ref _databaseUser, value))
-                RefreshDatabasePlan();
-        }
-    }
-
-    public string DatabasePlanTitle
-    {
-        get => _databasePlanTitle;
-        private set => SetField(ref _databasePlanTitle, value);
-    }
-
-    public string DatabasePlanSummary
-    {
-        get => _databasePlanSummary;
-        private set => SetField(ref _databasePlanSummary, value);
-    }
-
-    public string DatabaseValidationSummary
-    {
-        get => _databaseValidationSummary;
-        private set => SetField(ref _databaseValidationSummary, value);
-    }
-
-    public DatabaseValidationState DatabaseValidationState
-    {
-        get => _databaseValidationState;
-        private set => SetField(ref _databaseValidationState, value);
-    }
-
-    public string CredentialReference
-    {
-        get => _credentialReference;
-        private set => SetField(ref _credentialReference, value);
-    }
-
-    public string ApplicationDirectory
-    {
-        get => _applicationDirectory;
-        set => SetField(ref _applicationDirectory, value);
-    }
-
-    public string DataDirectory
-    {
-        get => _dataDirectory;
-        set => SetField(ref _dataDirectory, value);
-    }
-
-    public string CacheDirectory
-    {
-        get => _cacheDirectory;
-        set => SetField(ref _cacheDirectory, value);
-    }
-
-    public string LogDirectory
-    {
-        get => _logDirectory;
-        set => SetField(ref _logDirectory, value);
-    }
-
-    public string BackupDirectory
-    {
-        get => _backupDirectory;
-        set => SetField(ref _backupDirectory, value);
-    }
+    public string ApplicationDirectory { get => _applicationDirectory; set => SetField(ref _applicationDirectory, value); }
+    public string DataDirectory { get => _dataDirectory; set => SetField(ref _dataDirectory, value); }
+    public string CacheDirectory { get => _cacheDirectory; set => SetField(ref _cacheDirectory, value); }
+    public string LogDirectory { get => _logDirectory; set => SetField(ref _logDirectory, value); }
+    public string BackupDirectory { get => _backupDirectory; set => SetField(ref _backupDirectory, value); }
 
     public bool InstallForAllUsers
     {
@@ -315,75 +233,98 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public string StartMenuFolder
+    public string StartMenuFolder { get => _startMenuFolder; set => SetField(ref _startMenuFolder, value); }
+    public string PathValidationSummary { get => _pathValidationSummary; private set => SetField(ref _pathValidationSummary, value); }
+    public bool HasPathErrors { get => _hasPathErrors; private set => SetField(ref _hasPathErrors, value); }
+
+    public string DeviceDisplayName { get => _deviceDisplayName; set => SetField(ref _deviceDisplayName, value); }
+    public string WorkstationPurpose { get => _workstationPurpose; set => SetField(ref _workstationPurpose, value); }
+    public bool EnableDeviceBridge { get => _enableDeviceBridge; set => SetField(ref _enableDeviceBridge, value); }
+    public bool EnableSyncService { get => _enableSyncService; set => SetField(ref _enableSyncService, value); }
+    public bool EnableUpdater { get => _enableUpdater; set => SetField(ref _enableUpdater, value); }
+    public bool EnableDiagnostics { get => _enableDiagnostics; set => SetField(ref _enableDiagnostics, value); }
+
+    public bool CreateStartMenuShortcut { get => _createStartMenuShortcut; set => SetField(ref _createStartMenuShortcut, value); }
+    public bool CreateDesktopShortcut { get => _createDesktopShortcut; set => SetField(ref _createDesktopShortcut, value); }
+    public bool RunAtStartup { get => _runAtStartup; set => SetField(ref _runAtStartup, value); }
+    public string UpdateChannel { get => _updateChannel; set => SetField(ref _updateChannel, value); }
+    public bool DiagnosticsEnabled { get => _diagnosticsEnabled; set => SetField(ref _diagnosticsEnabled, value); }
+    public bool CrashReportingEnabled { get => _crashReportingEnabled; set => SetField(ref _crashReportingEnabled, value); }
+
+    public bool ReleaseReady
     {
-        get => _startMenuFolder;
-        set => SetField(ref _startMenuFolder, value);
+        get => _releaseReady;
+        private set
+        {
+            if (SetField(ref _releaseReady, value))
+                OnPropertyChanged(nameof(CanNext));
+        }
     }
 
-    public string PathValidationSummary
+    public string ReleaseSummary { get => _releaseSummary; private set => SetField(ref _releaseSummary, value); }
+    public string DeploymentMode { get => _deploymentMode; private set => SetField(ref _deploymentMode, value); }
+
+    public bool IsInstalling
     {
-        get => _pathValidationSummary;
-        private set => SetField(ref _pathValidationSummary, value);
+        get => _isInstalling;
+        private set
+        {
+            if (!SetField(ref _isInstalling, value)) return;
+            OnPropertyChanged(nameof(CanBack));
+            OnPropertyChanged(nameof(CanNext));
+            OnPropertyChanged(nameof(NextButtonText));
+        }
     }
 
-    public bool HasPathErrors
-    {
-        get => _hasPathErrors;
-        private set => SetField(ref _hasPathErrors, value);
-    }
+    public int InstallProgress { get => _installProgress; private set => SetField(ref _installProgress, value); }
+    public string InstallStatus { get => _installStatus; private set => SetField(ref _installStatus, value); }
+    public string CompleteSummary { get => _completeSummary; private set => SetField(ref _completeSummary, value); }
 
     public string FooterStatus => $"Step {CurrentStepIndex + 1} of 12 • {Steps[CurrentStepIndex].Title}";
-    public bool CanBack => CurrentStepIndex > 0 && CurrentStepIndex <= 5;
-    public bool CanNext => CurrentStepIndex < 5 && !(CurrentStepIndex == 1 && HasBlockingChecks);
+    public bool CanBack => !IsInstalling && CurrentStepIndex > 0 && CurrentStepIndex < 10;
+    public bool CanNext =>
+        !IsInstalling &&
+        CurrentStepIndex < 10 &&
+        !(CurrentStepIndex == 1 && HasBlockingChecks) &&
+        !(CurrentStepIndex == 3 && HasBlockingPrerequisites) &&
+        !(CurrentStepIndex == 5 && HasPathErrors) &&
+        !(CurrentStepIndex == 9 && !ReleaseReady);
+
+    public string NextButtonText => CurrentStepIndex == 9 ? "Install" : CurrentStepIndex == 10 ? "Installing…" : "Next";
     public string LogPath => _logger.Path;
 
     public void RefreshSystemChecks()
     {
         _logger.Log("system", "Running Windows compatibility checks.");
         SystemChecks.Clear();
-
-        var snapshot = _probe.Capture();
-        var results = _systemEvaluator.Evaluate(snapshot);
-        foreach (var result in results)
-            SystemChecks.Add(result);
+        var results = _systemEvaluator.Evaluate(_probe.Capture());
+        foreach (var result in results) SystemChecks.Add(result);
 
         HasBlockingChecks = results.Any(result => result.State == SystemCheckState.Block);
         SystemCheckSummary = HasBlockingChecks
             ? "This computer has one or more blocking compatibility issues that must be resolved before setup can continue."
             : "This computer is ready for a standard The Link workstation installation.";
-
-        _logger.Log("system", HasBlockingChecks
-            ? "Compatibility checks completed with blockers."
-            : "Compatibility checks completed without blockers.");
     }
 
     public void RefreshPrerequisites()
     {
-        _logger.Log("prerequisite", $"Scanning prerequisites for {SelectedInstallProfile}.");
         Prerequisites.Clear();
-
         var checks = _prerequisiteProbe.Capture(SelectedInstallProfile);
-        foreach (var check in checks)
-            Prerequisites.Add(check);
-
+        foreach (var check in checks) Prerequisites.Add(check);
         HasBlockingPrerequisites = _prerequisiteEvaluator.HasBlockingItems(checks);
         PrerequisiteSummary = _prerequisiteEvaluator.Summarise(checks);
     }
 
     public void DiscoverPostgreSql()
     {
-        _logger.Log("database", "Discovering local PostgreSQL installations.");
         PostgreSqlInstances.Clear();
-
         var instances = _postgreSqlDiscovery.Discover();
-        foreach (var instance in instances)
-            PostgreSqlInstances.Add(instance);
+        foreach (var instance in instances) PostgreSqlInstances.Add(instance);
 
         if (instances.Count > 0)
         {
             SelectedPostgreSql ??= instances[0];
-            PostgreSqlSummary = $"{instances.Count} PostgreSQL installation(s) discovered. Select one or enter an approved server manually.";
+            PostgreSqlSummary = $"{instances.Count} PostgreSQL installation(s) discovered.";
         }
         else
         {
@@ -401,7 +342,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             "sqliteonly" => DatabaseMode.SqliteOnly,
             _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unknown database mode.")
         };
-
         _logger.Log("database", $"Database mode selected: {DatabaseModeLabel}.");
     }
 
@@ -409,7 +349,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     {
         var options = BuildDatabaseOptions();
         var errors = _databasePlanner.Validate(options);
-
         if (errors.Count > 0)
         {
             DatabaseValidationState = DatabaseValidationState.Invalid;
@@ -417,90 +356,87 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             return;
         }
 
-        DatabaseValidationResult result;
-
-        switch (options.Mode)
+        DatabaseValidationResult result = options.Mode switch
         {
-            case DatabaseMode.CloudSupabaseWithLocalSqlite:
-                result = await _connectivity.TestCloudEndpointAsync(options.BackendUrl, cancellationToken);
-                break;
-
-            case DatabaseMode.ExistingPostgreSql:
-                result = await _connectivity.TestPostgreSqlAsync(
+            DatabaseMode.CloudSupabaseWithLocalSqlite =>
+                await _connectivity.TestCloudEndpointAsync(options.BackendUrl, cancellationToken),
+            DatabaseMode.ExistingPostgreSql =>
+                await _connectivity.TestPostgreSqlAsync(
                     options.Host,
                     options.Port,
                     options.DatabaseName,
                     options.UserName,
                     password,
                     _postgreSqlDiscovery.FindPsqlExecutable(SelectedPostgreSql),
-                    cancellationToken);
-                break;
-
-            case DatabaseMode.InstallLocalPostgreSql:
-                result = new(
-                    DatabaseValidationState.Pending,
-                    "Local PostgreSQL validation is staged.",
-                    "The signed PostgreSQL package is installed in the deployment phase; connectivity and restricted-role self-tests run immediately after installation.");
-                break;
-
-            case DatabaseMode.SqliteOnly:
-                result = new(
-                    DatabaseValidationState.Valid,
-                    "SQLite-only preparation is valid.",
-                    "Remote activation is intentionally deferred.");
-                break;
-
-            default:
-                throw new InvalidOperationException("Unsupported database mode.");
-        }
+                    cancellationToken),
+            DatabaseMode.InstallLocalPostgreSql => new(
+                DatabaseValidationState.Pending,
+                "Local PostgreSQL validation is staged.",
+                "The signed PostgreSQL package is installed during deployment, then validated."),
+            DatabaseMode.SqliteOnly => new(
+                DatabaseValidationState.Valid,
+                "SQLite-only preparation is valid.",
+                "Remote activation is intentionally deferred."),
+            _ => throw new InvalidOperationException("Unsupported database mode.")
+        };
 
         DatabaseValidationState = result.State;
         DatabaseValidationSummary = $"{result.Summary} {result.Detail}".Trim();
 
-        if (options.Mode == DatabaseMode.ExistingPostgreSql &&
-            result.IsSuccessful &&
-            !string.IsNullOrWhiteSpace(password))
+        if (options.Mode == DatabaseMode.ExistingPostgreSql && result.IsSuccessful && !string.IsNullOrWhiteSpace(password))
         {
             var target = _credentialStore.BuildDatabaseTarget(options);
             _credentialStore.Write(target, options.UserName, password);
-            CredentialReference = $"Stored securely in Windows Credential Manager: {target}";
-            _logger.Log("security", "Restricted PostgreSQL runtime credential stored in Windows Credential Manager.");
+            CredentialReference = target;
         }
-
-        _logger.Log("database", $"Database validation result: {result.State}. {result.Summary}");
     }
 
     public void ValidateInstallationLayout()
     {
-        var layout = BuildInstallationLayout();
-        var isAdministrator = _probe.Capture().IsAdministrator;
-        var result = _pathService.Validate(layout, isAdministrator);
-
+        var result = _pathService.Validate(BuildInstallationLayout(), _probe.Capture().IsAdministrator);
         PathMessages.Clear();
-        foreach (var error in result.Errors)
-            PathMessages.Add($"BLOCK: {error}");
-        foreach (var warning in result.Warnings)
-            PathMessages.Add($"NOTE: {warning}");
-
+        foreach (var error in result.Errors) PathMessages.Add($"BLOCK: {error}");
+        foreach (var warning in result.Warnings) PathMessages.Add($"NOTE: {warning}");
         HasPathErrors = !result.IsValid;
         PathValidationSummary = result.IsValid
-            ? "Installation paths are valid. Writable data directories will be created only when installation begins."
+            ? "Installation paths are valid."
             : "One or more installation path problems must be corrected.";
-
-        _logger.Log("paths", result.IsValid ? "Installation layout validated." : "Installation layout validation failed.");
     }
 
-    public IReadOnlyList<string> PrepareDataDirectoriesForInstall()
+    public void RefreshReview()
     {
-        var layout = BuildInstallationLayout();
-        var validation = _pathService.Validate(layout, _probe.Capture().IsAdministrator);
-        if (!validation.IsValid)
-            throw new InvalidOperationException(string.Join(" ", validation.Errors));
+        ReviewItems.Clear();
+        ValidateInstallationLayout();
 
-        return _pathService.PrepareWritableDataDirectories(layout);
+        try
+        {
+            var prepared = _installationEngine.Prepare(BuildInstallationLayout());
+            ReleaseReady = true;
+            DeploymentMode = prepared.Plan.Mode.ToString();
+            ReleaseSummary = $"The Link {prepared.Release.Version} • {prepared.Release.Architecture} • {prepared.Plan.Mode}";
+            ReviewItems.Add($"Product: The Link {prepared.Release.Version}");
+            ReviewItems.Add($"Deployment: {prepared.Plan.Mode}");
+            ReviewItems.Add($"Install profile: {SelectedInstallProfile}");
+            ReviewItems.Add($"Database mode: {DatabaseModeLabel}");
+            ReviewItems.Add($"Application: {ApplicationDirectory}");
+            ReviewItems.Add($"Local data: {DataDirectory}");
+            ReviewItems.Add($"Device: {DeviceDisplayName} / {WorkstationPurpose}");
+            ReviewItems.Add($"Services: Device Bridge={EnableDeviceBridge}, Sync={EnableSyncService}, Updater={EnableUpdater}, Diagnostics={EnableDiagnostics}");
+            ReviewItems.Add($"Shortcuts: Start Menu={CreateStartMenuShortcut}, Desktop={CreateDesktopShortcut}, Start with Windows={RunAtStartup}");
+            ReviewItems.Add($"Update channel: {UpdateChannel}");
+            ReviewItems.Add("Rollback: application checkpoint before upgrade/repair.");
+            ReviewItems.Add("Data policy: mutable business data remains outside the application directory.");
+        }
+        catch (Exception ex)
+        {
+            ReleaseReady = false;
+            DeploymentMode = "Unavailable";
+            ReleaseSummary = ex.Message;
+            ReviewItems.Add("Stage and verify a prepared Link-Core Windows release before installing.");
+        }
     }
 
-    public void Next()
+    public async Task NextAsync(CancellationToken cancellationToken = default)
     {
         if (!CanNext) return;
 
@@ -511,17 +447,23 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             return;
         }
 
+        if (CurrentStepIndex == 9)
+        {
+            CurrentStepIndex = 10;
+            await RunInstallationAsync(cancellationToken);
+            return;
+        }
+
         CurrentStepIndex++;
 
-        if (CurrentStepIndex == 3)
-            RefreshPrerequisites();
+        if (CurrentStepIndex == 3) RefreshPrerequisites();
         else if (CurrentStepIndex == 4)
         {
             DiscoverPostgreSql();
             RefreshDatabasePlan();
         }
-        else if (CurrentStepIndex == 5)
-            ValidateInstallationLayout();
+        else if (CurrentStepIndex == 5) ValidateInstallationLayout();
+        else if (CurrentStepIndex == 9) RefreshReview();
     }
 
     public void Back()
@@ -532,21 +474,77 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public void SelectProfile(string profile)
     {
         SelectedInstallProfile = profile;
-        _logger.Log("profile", $"Install profile selected: {profile}.");
-
         if (profile.Contains("Branch Server", StringComparison.OrdinalIgnoreCase) &&
             SelectedDatabaseMode == DatabaseMode.CloudSupabaseWithLocalSqlite)
             SelectDatabaseMode("installpg");
+        if (CurrentStepIndex >= 3) RefreshPrerequisites();
+    }
 
-        if (CurrentStepIndex >= 3)
-            RefreshPrerequisites();
+    private async Task RunInstallationAsync(CancellationToken cancellationToken)
+    {
+        IsInstalling = true;
+        InstallProgress = 0;
+        InstallLog.Clear();
+
+        try
+        {
+            _pathService.PrepareWritableDataDirectories(BuildInstallationLayout());
+
+            var configuration = new RuntimeConfiguration(
+                "Production",
+                UpdateChannel,
+                BackendUrl.Trim(),
+                DatabaseModeLabel,
+                CredentialReference,
+                DataDirectory,
+                CacheDirectory,
+                LogDirectory,
+                DiagnosticsEnabled,
+                CrashReportingEnabled,
+                "Link Windows Installer by MeetWell Technologies",
+                DateTimeOffset.UtcNow.ToString("O"));
+
+            var progress = new Progress<DeploymentProgress>(item =>
+            {
+                InstallProgress = item.Percent;
+                InstallStatus = $"{item.Stage} • {item.Detail}";
+                InstallLog.Add($"[{item.Percent}%] {item.Stage}: {item.Detail}");
+            });
+
+            var state = await _installationEngine.InstallAsync(
+                BuildInstallationLayout(),
+                configuration,
+                CreateDesktopShortcut,
+                CreateStartMenuShortcut,
+                RunAtStartup,
+                EnableDeviceBridge,
+                EnableSyncService,
+                EnableUpdater,
+                EnableDiagnostics,
+                progress,
+                cancellationToken);
+
+            CompleteSummary = $"The Link {state.Version} installed successfully. Application files, runtime configuration, shortcuts and installer state passed post-install validation.";
+            CurrentStepIndex = 11;
+        }
+        catch (Exception ex)
+        {
+            InstallStatus = "Installation failed; rollback was attempted.";
+            InstallLog.Add("[error] " + ex.Message);
+            _logger.Log("error", ex.Message);
+            CurrentStepIndex = 9;
+            RefreshReview();
+        }
+        finally
+        {
+            IsInstalling = false;
+        }
     }
 
     private void RefreshDatabasePlan()
     {
         var options = BuildDatabaseOptions();
         var errors = _databasePlanner.Validate(options);
-
         DatabasePlanSteps.Clear();
         DatabaseSecurityControls.Clear();
 
@@ -554,23 +552,19 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         {
             DatabasePlanTitle = DatabaseModeLabel;
             DatabasePlanSummary = "Configuration incomplete: " + string.Join(" ", errors);
-            foreach (var error in errors)
-                DatabasePlanSteps.Add("Complete: " + error);
+            foreach (var error in errors) DatabasePlanSteps.Add("Complete: " + error);
             return;
         }
 
         var plan = _databasePlanner.CreatePlan(options);
         var bootstrap = _bootstrapPlanner.Create(options);
-
         DatabasePlanTitle = plan.Title;
         DatabasePlanSummary = plan.Summary;
 
-        foreach (var step in plan.Steps)
-            DatabasePlanSteps.Add(step);
+        foreach (var step in plan.Steps) DatabasePlanSteps.Add(step);
         foreach (var action in bootstrap.OrderedActions.Where(action => !DatabasePlanSteps.Contains(action)))
             DatabasePlanSteps.Add(action);
-        foreach (var control in bootstrap.SecurityControls)
-            DatabaseSecurityControls.Add(control);
+        foreach (var control in bootstrap.SecurityControls) DatabaseSecurityControls.Add(control);
 
         if (bootstrap.RunsProductionCloudDdl)
             throw new InvalidOperationException("Installer security invariant violated: production cloud DDL is forbidden.");

@@ -1,69 +1,39 @@
 # Link Windows Installer Architecture
 
-## Purpose
+## Boundaries
 
-`Link-Windows-Installer` owns Windows installation orchestration. It does **not** own Link-Core business logic, production Supabase schema administration or organisation permissions.
+`Link-Windows-Installer` owns Windows setup orchestration, not Link-Core business logic and not production Supabase administration.
 
-## Projects
+### Core project
+Contains platform-neutral compatibility, path, prerequisite, database, release-manifest, deployment, upgrade/repair and uninstall policy.
 
-### Link.Windows.Installer.Core
-Platform-neutral rules and models:
-- compatibility evaluation,
-- installation layout policy,
-- prerequisite state/evaluation,
-- database-mode planning,
-- database bootstrap/security invariants.
+### Windows project
+Contains the WPF wizard, Windows probing, Credential Manager, release payload verification, transactional file deployment, runtime config/state persistence, shortcuts, startup/uninstall metadata, optional service registration and uninstall execution.
 
-### Link.Windows.Installer
-Windows/WPF implementation:
-- canonical installer UI,
-- Windows system probing,
-- prerequisite registry probing,
-- PostgreSQL discovery,
-- endpoint/psql validation,
-- Windows Credential Manager,
-- setup logging,
-- later file/service/update/uninstall execution.
-
-## Current flow
+## Deployment
 
 ```text
-Welcome
-  -> System Check
-  -> Install Type
-  -> Components + Prerequisites
-  -> Database / SQL
-  -> Install Location
-  -> P8+ execution/configuration screens
+prepared Link-Core Windows release
+  -> release-manifest.json + SHA-256/size verification
+  -> Review
+  -> application checkpoint
+  -> transactional deployment
+  -> client-safe runtime configuration
+  -> Windows integration
+  -> persisted installation state
+  -> post-install validation
 ```
 
-The screen order follows the canonical HTML even though implementation phases are organised by engineering dependency.
+Install state determines Install, Upgrade or Repair. Standard downgrades are blocked.
 
-## Data architecture rules
+## Data safety
 
-### Normal workstation
-```text
-The Link Windows
-  -> local SQLite cache/offline layer
-  -> authenticated Link/Supabase backend
-```
+Application binaries live separately from mutable business/cache data. Normal uninstall preserves data/logs/backups. `--purge-data` is explicit and destructive.
 
-The installer verifies client-safe backend configuration and reachability. It never stores production `service_role` credentials and never runs production cloud DDL.
+## Database safety
 
-### Approved branch/server
-Existing or locally installed PostgreSQL may be used only for an explicitly approved deployment profile. Bootstrap is driven by a signed migration bundle and separates privileged migration identity from restricted runtime identity.
+Normal workstation mode uses cloud backend + local SQLite. Production cloud DDL and production `service_role` storage are prohibited.
 
-## Filesystem baseline
+## Packaging
 
-Per-machine default:
-- Application: `C:\Program Files\The Link`
-- Mutable data: `C:\ProgramData\The Link`
-- SQLite/cache: `C:\ProgramData\The Link\Data`
-- Setup logs: `C:\ProgramData\The Link\Logs\Setup`
-- Migration backups: `C:\ProgramData\The Link\Backups`
-
-Application binaries and mutable business data are never intentionally co-located.
-
-## Release boundary
-
-The installer consumes a prepared Link-Core Windows release artifact in P8. Final EXE packaging remains a manual release operation.
+Source version is 1.0.0-rc1. Final EXE creation/signing remains manual.

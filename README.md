@@ -1,85 +1,77 @@
 # The Link — Windows Installer
 
-Source repository for **The Link Windows Installation & Configuration Wizard**.
+Production-candidate source for **The Link Windows Installation & Configuration Wizard**.
 
-> Current implementation: **LWI-P0/14 through LWI-P7/14**.
+> Phase status: **LWI-P0/14 through LWI-P13/14 complete**  
+> Source version: **1.0.0-rc1**  
+> Final EXE packaging: **manual**
 
-## Canonical UI reference
+## Canonical UI
 
-The implementation follows `the_link_windows_installer_comprehensive_mockup.html` as the canonical Windows installer UI and interaction reference. The production source preserves its 12-step wizard, dark Link header/sidebar, green status language, guided cards, workstation profiles, database choices and install-path flow.
-
-**Branding attribution:** By MeetWell Technologies.
-
-## Completed phases
-
-- **LWI-P0/14 — Repository & Architecture Foundation**
-- **LWI-P1/14 — Installer Shell & Branding**
-- **LWI-P2/14 — Windows Environment Detection**
-- **LWI-P3/14 — Installation Location & File Layout**
-- **LWI-P4/14 — Prerequisite Manager**
-- **LWI-P5/14 — PostgreSQL Detection**
-- **LWI-P6/14 — Database Setup**
-- **LWI-P7/14 — Database Bootstrap & Security**
-
-The final installer executable is **not generated automatically**. Source validation and build checks are provided; final EXE packaging remains a manual release step.
-
-## Implemented setup flow
-
-The working source now covers:
+The installer follows `the_link_windows_installer_comprehensive_mockup.html` as the canonical UI reference. The WPF implementation includes all 12 screens:
 
 ```text
 Welcome
-  -> System Check
-  -> Install Type
-  -> Components / Prerequisites
-  -> Database / SQL
-  -> Install Location
+System Check
+Install Type
+Components
+Database / SQL
+Install Location
+Device & Services
+Network & Security
+Updates & Privacy
+Review
+Installing
+Complete
 ```
 
-Later screens remain visible in the 12-step shell and are implemented from P8 onward.
+Branding attribution: **By MeetWell Technologies**.
 
-## Technology
+## What is implemented
 
-- C# / .NET 8
-- WPF
-- No third-party UI framework
-- Windows-native system and registry probing
-- Platform-neutral installer policy rules in `Link.Windows.Installer.Core`
-- Windows Credential Manager for validated PostgreSQL runtime secrets
-- Architecture prepared for install, repair, upgrade and uninstall engines
+- Windows 10/11 x64/ARM64 compatibility probing
+- prerequisite detection
+- Program Files / ProgramData layout
+- cloud + local SQLite default architecture
+- advanced PostgreSQL branch/server setup paths
+- no production cloud DDL / no service_role storage
+- Link-Core release manifest validation
+- SHA-256 + size verification for every required staged file
+- install / upgrade / repair mode detection
+- transactional application rollback checkpoint
+- runtime configuration and installation-state persistence
+- Windows Credential Manager for PostgreSQL runtime secrets
+- Start Menu/Desktop/startup integration
+- Add/Remove Programs metadata
+- signed-payload service registration hooks
+- uninstall preserving business/cache data by default
+- explicit purge-data uninstall path
+- manual packaging/readiness scripts
 
-## Development
-
-On Windows with the .NET 8 SDK:
+## Build
 
 ```powershell
-dotnet restore
+dotnet restore .\Link.Windows.Installer.sln
 dotnet build .\Link.Windows.Installer.sln -c Debug
 dotnet run --project .\tests\Link.Windows.Installer.Core.SmokeTests\Link.Windows.Installer.Core.SmokeTests.csproj -c Debug
 ```
 
-Run source validation:
+## Stage Link-Core
 
 ```powershell
-.\scripts\validate-source.ps1 -Build
+.\scripts\new-release-manifest.ps1 -ReleaseFolder "<Link-Core Release>" -Version "1.0.0" -Architecture x64 -EntryPoint "the_link.exe"
+.\scripts\stage-link-core.ps1 -Source "<Link-Core Release>"
+.\scripts\verify-release.ps1
 ```
 
-## Database deployment rule
+## Manual packaging gate
 
-A normal workstation uses **Cloud Supabase/PostgreSQL + local SQLite**. Local PostgreSQL is an advanced branch/server option only.
+```powershell
+.\scripts\manual-package-check.ps1
+```
 
-The desktop installer must never store a production Supabase `service_role` secret or run production cloud DDL from an ordinary workstation installation.
+Then create/sign the final EXE using the manually controlled Windows packaging workflow.
 
-For approved local/branch PostgreSQL, the installer uses a separate privileged migration/bootstrap identity and a restricted runtime identity. Runtime secrets are stored through Windows Credential Manager rather than plaintext configuration.
-
-See:
-- `docs/DATABASE_SECURITY.md`
-- `docs/INSTALLATION_LAYOUT.md`
-- `docs/PREREQUISITES.md`
-- `docs/PHASES.md`
-
-## Release rule
-
-P8 will consume a prepared Link-Core Windows release artifact. Link-Core source code is not copied into this repository.
+See `docs/RELEASE_MANIFEST.md`, `docs/UPGRADE_REPAIR_UNINSTALL.md`, and `docs/MANUAL_PACKAGING.md`.
 
 **By MeetWell Technologies**

@@ -1,48 +1,38 @@
 # Changelog
 
+## 1.0.0-rc1 — 2026-09-26
+
+### LWI-P8/14 — Application Deployment
+- Added Link-Core release manifest and SHA-256/file-size validation.
+- Added safe staged-path resolution and verified deployment engine.
+
+### LWI-P9/14 — Configuration & Environment
+- Added client-safe runtime configuration generation.
+- Added persisted installation state and manifest fingerprinting.
+
+### LWI-P10/14 — Windows Integration
+- Added Start Menu/Desktop shortcut creation.
+- Added optional startup registration and Add/Remove Programs metadata.
+- Added manifest-driven service-registration hooks.
+
+### LWI-P11/14 — Upgrade / Repair / Rollback
+- Added install/upgrade/repair detection and downgrade blocking.
+- Added application checkpoints and transactional rollback.
+
+### LWI-P12/14 — Uninstall & Data Preservation
+- Added real command-line uninstall execution.
+- Added default business/cache/log/backup preservation.
+- Added explicit destructive purge-data uninstall confirmation.
+
+### LWI-P13/14 — Validation & Manual Packaging Readiness
+- Expanded smoke tests across manifest, upgrade, repair, downgrade and uninstall policy.
+- Added manifest generation, staging, release verification and manual packaging-readiness scripts.
+- Completed all canonical installer UI screens.
+
 ## 0.7.0-dev — 2026-09-26
 
-### LWI-P3/14 — Installation Location & File Layout
-- Added per-machine/current-user layout policy and canonical default paths.
-- Added path, free-space, UNC, data separation and existing-directory validation.
-- Added safe writable-data directory preparation hook.
-- Implemented the HTML-referenced Install Location UI.
-
-### LWI-P4/14 — Prerequisite Manager
-- Added profile-aware prerequisite models and evaluator.
-- Added Visual C++ runtime, optional WebView2, bundled SQLite and PostgreSQL inventory.
-- Added signed-payload remediation states and prerequisite UI.
-
-### LWI-P5/14 — PostgreSQL Detection
-- Added registry and Program Files discovery.
-- Added version, service, data directory, port and running-state detection.
-- Added psql executable resolution.
-
-### LWI-P6/14 — Database Setup
-- Added four database deployment modes matching the canonical HTML.
-- Added cloud/backend TCP reachability checks.
-- Added PostgreSQL network and authenticated psql SELECT 1 validation.
-- Added database setup planning and guided UI.
-
-### LWI-P7/14 — Database Bootstrap & Security
-- Added per-mode bootstrap/security plans.
-- Enforced no production cloud DDL from workstation setup.
-- Added signed migration, least-privilege, backup/checkpoint and explicit-grant contracts.
-- Added Windows Credential Manager storage for validated PostgreSQL runtime secrets.
+Completed LWI-P3 through LWI-P7: install layout, prerequisites, PostgreSQL discovery, database setup and database bootstrap/security.
 
 ## 0.2.0-dev — 2026-09-26
 
-### LWI-P0/14 — Repository & Architecture Foundation
-- Established .NET 8 solution structure and project boundaries.
-- Added logging and source validation foundations.
-- Established manual final-EXE packaging policy.
-
-### LWI-P1/14 — Installer Shell & Branding
-- Implemented WPF shell based on the canonical installer HTML.
-- Added the 12-step navigation rail and first three setup experiences.
-- Standardised attribution to **By MeetWell Technologies**.
-
-### LWI-P2/14 — Windows Environment Detection
-- Added Windows build/edition, architecture, disk, memory, network and elevation checks.
-- Added SQLite readiness state and local PostgreSQL detection.
-- Added blocker/warning/information evaluation rules.
+Completed LWI-P0 through LWI-P2: repository foundation, branded shell and Windows environment detection.
