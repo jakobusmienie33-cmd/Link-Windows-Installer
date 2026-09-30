@@ -1,6 +1,6 @@
 # Link Windows Installer — Phase Status
 
-All planned Windows installer phases are complete at source level. Final EXE packaging remains manual.
+The original installer programme LWI-P0/18–LWI-P13/18 is source-complete. The automatic-update extension is active: LWI-P14/18 has a source foundation with validation pending, and LWI-P15/18–LWI-P17/18 remain planned. Final production packaging/signing remains controlled separately.
 
 ## LWI-P0/18 — Repository & Architecture Foundation
 **Status: Complete**
