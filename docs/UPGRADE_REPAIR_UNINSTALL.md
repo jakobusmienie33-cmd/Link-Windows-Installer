@@ -31,3 +31,12 @@ Destructive local-data removal requires:
 ```
 
 and an interactive warning/confirmation.
+
+
+## Automatic background upgrade
+
+The production target no longer requires users to uninstall/reinstall for normal updates. Link-Core Release Control resolves the approved release; the Windows updater downloads, verifies and stages it in the background. Activation happens only when the client is safe, or inside the configured maintenance window for Scheduled policy.
+
+The stable launcher/updater and version-slot migration is tracked in LWI-P15/18–LWI-P17/18. Until that work is complete, the existing transactional application checkpoint remains the active rollback mechanism.
+
+Database and local-state changes must remain compatible with the retained previous application version during the rollback window.
