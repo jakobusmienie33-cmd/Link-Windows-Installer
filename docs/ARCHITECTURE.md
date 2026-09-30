@@ -37,3 +37,21 @@ Normal workstation mode uses cloud backend + local SQLite. Production cloud DDL 
 ## Packaging
 
 Source version is 1.0.0-rc1. Final EXE creation/signing remains manual.
+
+
+## Automatic update extension
+
+Link-Core remains the Release Control authority. This repository supplies the Windows-native bootstrap/update adapter.
+
+The target layout separates stable bootstrap binaries from versioned Flutter application releases:
+
+```text
+Program Files/The Link/Launcher
+Program Files/The Link/Updater
+Program Files/The Link/Versions/<version>
+ProgramData/The Link/Updater/{Staging,current-version.txt,previous-version.txt}
+```
+
+The updater downloads and verifies in the background, stages without touching the running version, and activates only at a Link-Core-declared safe point. Automatic is the default policy; Scheduled and Manual remain available. The previous known-good version is retained for rollback.
+
+See `docs/AUTOMATIC_UPDATES.md`.

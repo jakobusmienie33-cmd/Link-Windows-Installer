@@ -148,6 +148,47 @@ Assert(uninstallPlan.RemovePaths.Contains(validLayout.ApplicationDirectory),
 Assert(uninstallPlan.PreservePaths.Contains(validLayout.DataDirectory),
     "Default uninstall must preserve local business/cache data.");
 
+
+var versionSlots = new VersionSlotLayoutPlanner().Create(
+    @"C:\Program Files\The Link",
+    @"C:\ProgramData\The Link");
+Assert(versionSlots.VersionsDirectory.EndsWith(@"The Link\Versions", StringComparison.OrdinalIgnoreCase),
+    "Versioned applications must live under the stable application root.");
+Assert(versionSlots.UpdateStateDirectory.StartsWith(@"C:\ProgramData\The Link", StringComparison.OrdinalIgnoreCase),
+    "Mutable updater state must stay outside Program Files version folders.");
+
+var updatePlanner = new AutomaticUpdatePlanner();
+var automaticSnapshot = new ClientUpdateSnapshot(
+    "1.8.4", "1.8.3", "1.0.0", ClientUpdatePolicy.Automatic,
+    false, true, null);
+var updateDirective = new ReleaseUpdateDirective(
+    "1.9.0", ReleaseDirectiveStatus.Active, "1.0.0");
+
+var downloadPlan = updatePlanner.Plan(updateDirective, automaticSnapshot);
+Assert(downloadPlan.Action == ClientUpdateAction.DownloadAndStage,
+    "Automatic policy should download and stage a newer compatible release.");
+
+var activationPlan = updatePlanner.Plan(
+    updateDirective,
+    automaticSnapshot with { StagedVersion = "1.9.0" });
+Assert(activationPlan.Action == ClientUpdateAction.ActivateStaged,
+    "A staged release at a safe point should be activated automatically.");
+
+var protectedPlan = updatePlanner.Plan(
+    updateDirective,
+    automaticSnapshot with { StagedVersion = "1.9.0", CriticalWorkflowActive = true });
+Assert(protectedPlan.Action == ClientUpdateAction.WaitForSafeActivation,
+    "A staged release must wait rather than download again while a protected workflow is active.");
+Assert(protectedPlan.ActivationDeferred,
+    "Protected business workflows must defer update activation.");
+
+var rollbackPlan = updatePlanner.Plan(
+    new ReleaseUpdateDirective(
+        "1.9.0", ReleaseDirectiveStatus.Rollback, "1.0.0", "1.8.3"),
+    automaticSnapshot);
+Assert(rollbackPlan.Action == ClientUpdateAction.Rollback,
+    "Release Control should be able to target the retained previous version for rollback.");
+
 Console.WriteLine("Link.Windows.Installer.Core smoke tests passed.");
 return 0;
 
