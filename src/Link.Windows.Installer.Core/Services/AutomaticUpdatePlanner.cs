@@ -77,12 +77,12 @@ public sealed class AutomaticUpdatePlanner
                 new[] { "Candidate is staged and the client is at a safe activation point." });
         }
 
-        var reasons = new List<string>
-        {
-            staged
-                ? "Candidate is already staged."
-                : "Candidate must be downloaded, verified and staged."
-        };
+        var reasons = new List<string>();
+
+        if (staged)
+            reasons.Add("Candidate is already staged.");
+        else
+            reasons.Add("Candidate must be downloaded, verified and staged.");
 
         if (installed.CriticalWorkflowActive)
             reasons.Add("Activation is deferred because a protected workflow is active.");
@@ -92,7 +92,9 @@ public sealed class AutomaticUpdatePlanner
             reasons.Add("Activation is deferred until the configured maintenance window.");
 
         return new ClientUpdatePlan(
-            ClientUpdateAction.DownloadAndStage,
+            staged
+                ? ClientUpdateAction.WaitForSafeActivation
+                : ClientUpdateAction.DownloadAndStage,
             release.Version,
             !activationAllowed,
             reasons);
