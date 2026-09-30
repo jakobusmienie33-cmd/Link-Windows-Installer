@@ -2,7 +2,7 @@
 
 Production-candidate source for **The Link Windows Installation & Configuration Wizard**.
 
-> Phase status: **LWI-P0/14 through LWI-P13/14 complete**  
+> Phase status: **LWI-P0/18 through LWI-P13/18 source-complete; LWI-P14/18 updater foundation implemented / validation pending; LWI-P15/18–LWI-P17/18 planned**  
 > Source version: **1.0.0-rc1**  
 > Final EXE packaging: **manual**
 
@@ -39,6 +39,9 @@ Branding attribution: **By MeetWell Technologies**.
 - SHA-256 + size verification for every required staged file
 - install / upgrade / repair mode detection
 - transactional application rollback checkpoint
+- automatic background update planning with Automatic/Scheduled/Manual policy
+- stable launcher/updater + version-slot target architecture
+- protected-workflow safe activation and retained-version rollback planning
 - runtime configuration and installation-state persistence
 - Windows Credential Manager for PostgreSQL runtime secrets
 - Start Menu/Desktop/startup integration
@@ -72,6 +75,6 @@ dotnet run --project .\tests\Link.Windows.Installer.Core.SmokeTests\Link.Windows
 
 Then create/sign the final EXE using the manually controlled Windows packaging workflow.
 
-See `docs/RELEASE_MANIFEST.md`, `docs/UPGRADE_REPAIR_UNINSTALL.md`, and `docs/MANUAL_PACKAGING.md`.
+See `docs/RELEASE_MANIFEST.md`, `docs/UPGRADE_REPAIR_UNINSTALL.md`, `docs/AUTOMATIC_UPDATES.md`, and `docs/MANUAL_PACKAGING.md`.
 
 **By MeetWell Technologies**
