@@ -21,6 +21,7 @@ public enum ClientUpdateAction
     None,
     NotifyOnly,
     DownloadAndStage,
+    WaitForSafeActivation,
     ActivateStaged,
     Rollback,
     Blocked
