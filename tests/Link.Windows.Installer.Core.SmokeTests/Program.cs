@@ -177,6 +177,8 @@ Assert(activationPlan.Action == ClientUpdateAction.ActivateStaged,
 var protectedPlan = updatePlanner.Plan(
     updateDirective,
     automaticSnapshot with { StagedVersion = "1.9.0", CriticalWorkflowActive = true });
+Assert(protectedPlan.Action == ClientUpdateAction.WaitForSafeActivation,
+    "A staged release must wait rather than download again while a protected workflow is active.");
 Assert(protectedPlan.ActivationDeferred,
     "Protected business workflows must defer update activation.");
 
