@@ -74,6 +74,14 @@ public sealed class InstallationEngine
             layout.ApplicationDirectory,
             layout.BackupDirectory);
 
+        // Never claim an enabled update/sync/device service was installed
+        // when its binary was omitted from the signed, staged release.
+        // Check BEFORE app deployment so missing optional-service payloads
+        // cannot strand a partial installation.
+        ValidateSelectedServicePayloads(
+            staging, release, enableDeviceBridge, enableSyncService,
+            enableUpdater, enableDiagnostics);
+
         _logger.Log("install", plan.Summary);
         await _deployment.DeployAsync(staging, release, plan, progress, cancellationToken);
 
@@ -121,6 +129,34 @@ public sealed class InstallationEngine
         progress?.Report(new(100, "Installation complete", $"The Link {release.Version} is ready."));
         _logger.Log("install", $"Installation completed successfully: {release.Version}.");
         return state;
+    }
+
+    private static void ValidateSelectedServicePayloads(
+        string staging, ReleaseManifest release,
+        bool deviceBridge, bool sync, bool updater, bool diagnostics)
+    {
+        var selected = new (bool Enabled, string RelativePath)[]
+        {
+            (deviceBridge, "services/device-bridge/Link.DeviceBridge.exe"),
+            (sync, "services/sync/Link.SyncService.exe"),
+            (updater, "services/updater/Link.Updater.exe"),
+            (diagnostics, "services/diagnostics/Link.Diagnostics.exe"),
+        };
+
+        foreach (var service in selected.Where(x => x.Enabled))
+        {
+            if (!release.Files.Any(x => x.Required &&
+                string.Equals(
+                    x.Path.Replace('\\', '/'),
+                    service.RelativePath, StringComparison.OrdinalIgnoreCase)))
+                throw new InvalidOperationException(
+                    $"Selected service is missing from the required release manifest: {service.RelativePath}");
+
+            var source = ReleasePayloadService.ResolveSafePath(staging, service.RelativePath);
+            if (!File.Exists(source))
+                throw new FileNotFoundException(
+                    $"Selected service executable is absent from staging: {service.RelativePath}", source);
+        }
     }
 
     public void ValidateInstalledState(InstallationLayout layout, InstalledState state)
