@@ -47,7 +47,7 @@ public sealed class TransactionalDeploymentService
                 await Task.Yield();
             }
 
-            // Only remove files recorded by the previous signed release.
+            // Only remove files recorded by the previous validated release.
             // Never recursively delete unknown directories or user data.
             // Errors restore the checkpoint in this same transaction.
             foreach (var obsoletePath in plan.FilesToRemove)
