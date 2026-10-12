@@ -141,7 +141,7 @@ var untrackedUpgrade = deploymentPlanner.Plan(
     upgradeManifest, installed,
     @"C:\Program Files\The Link", @"C:\ProgramData\The Link\Backups");
 Assert(untrackedUpgrade.FilesToRemove.Count == 0,
-    "Legacy installation with no signed release inventory must not be cleaned blindly.");
+    "Legacy installation with no release inventory must not be cleaned blindly.");
 var unsafePrevious = installed with
 {
     ReleaseFilePaths = new[] { "../user-data.txt" }
