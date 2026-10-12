@@ -47,6 +47,18 @@ public sealed class TransactionalDeploymentService
                 await Task.Yield();
             }
 
+            // Only remove files recorded by the previous signed release.
+            // Never recursively delete unknown directories or user data.
+            // Errors restore the checkpoint in this same transaction.
+            foreach (var obsoletePath in plan.FilesToRemove)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var target = ReleasePayloadService.ResolveSafePath(
+                    plan.ApplicationDirectory, obsoletePath);
+                if (File.Exists(target))
+                    File.Delete(target);
+            }
+
             progress?.Report(new(90, "Verifying deployment", "Confirming application entry point."));
             var entryPoint = ReleasePayloadService.ResolveSafePath(plan.ApplicationDirectory, release.EntryPoint);
             if (!File.Exists(entryPoint))
