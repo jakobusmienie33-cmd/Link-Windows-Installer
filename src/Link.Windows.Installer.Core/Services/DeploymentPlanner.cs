@@ -31,7 +31,7 @@ public sealed class DeploymentPlanner
                 if (string.IsNullOrWhiteSpace(path) ||
                     Path.IsPathRooted(path) ||
                     path.Contains("..", StringComparison.Ordinal) ||
-                    path.Contains(':', StringComparison.Ordinal))
+                    path.Contains(':'))
                     throw new InvalidOperationException(
                         "Previous release inventory contains an unsafe path.");
                 return !releaseSet.Contains(Normalise(path));
