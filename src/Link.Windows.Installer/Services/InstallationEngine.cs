@@ -119,7 +119,9 @@ public sealed class InstallationEngine
             DateTimeOffset.UtcNow.ToString("O"),
             fingerprint,
             configuration.UpdateChannel,
-            layout.PerMachine);
+            layout.PerMachine,
+            release.Files.Where(file => file.Required)
+                .Select(file => file.Path).ToArray());
 
         _stateStore.Save(layout.DataDirectory, state);
 
