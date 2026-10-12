@@ -21,7 +21,22 @@ public sealed class DeploymentPlanner
             release.Files.Select(file => Normalise(file.Path)),
             StringComparer.OrdinalIgnoreCase);
 
-        var filesToRemove = Array.Empty<string>();
+        // Remove only files from the previous successfully installed
+        // release manifest. Older installations without an inventory are
+        // intentionally not cleaned by guessing file names.
+        var filesToRemove = mode == DeploymentMode.Upgrade &&
+                            installed?.ReleaseFilePaths is { } previous
+            ? previous.Where(path =>
+            {
+                if (string.IsNullOrWhiteSpace(path) ||
+                    Path.IsPathRooted(path) ||
+                    path.Contains("..", StringComparison.Ordinal) ||
+                    path.Contains(':', StringComparison.Ordinal))
+                    throw new InvalidOperationException(
+                        "Previous release inventory contains an unsafe path.");
+                return !releaseSet.Contains(Normalise(path));
+            }).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
+            : Array.Empty<string>();
 
         return new DeploymentPlan(
             mode,
