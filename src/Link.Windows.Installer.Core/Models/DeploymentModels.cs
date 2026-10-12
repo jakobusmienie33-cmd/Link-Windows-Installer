@@ -32,7 +32,8 @@ public sealed record InstalledState(
     string InstalledAtUtc,
     string ReleaseManifestSha256,
     string UpdateChannel,
-    bool PerMachine);
+    bool PerMachine,
+    IReadOnlyList<string>? ReleaseFilePaths = null);
 
 public sealed record DeploymentPlan(
     DeploymentMode Mode,
