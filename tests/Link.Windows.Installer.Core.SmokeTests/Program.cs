@@ -128,6 +128,37 @@ var upgradeManifest = manifest with { Version = "1.1.0" };
 Assert(deploymentPlanner.DetermineMode(upgradeManifest, installed) == DeploymentMode.Upgrade,
     "Newer payload must produce Upgrade mode.");
 
+var trackedPrevious = installed with
+{
+    ReleaseFilePaths = new[] { "the_link.exe", "obsolete_runtime.dll" }
+};
+var trackedUpgrade = deploymentPlanner.Plan(
+    upgradeManifest, trackedPrevious,
+    @"C:\Program Files\The Link", @"C:\ProgramData\The Link\Backups");
+Assert(trackedUpgrade.FilesToRemove.SequenceEqual(new[] { "obsolete_runtime.dll" }),
+    "Upgrade should remove only files from a previously installed release manifest.");
+var untrackedUpgrade = deploymentPlanner.Plan(
+    upgradeManifest, installed,
+    @"C:\Program Files\The Link", @"C:\ProgramData\The Link\Backups");
+Assert(untrackedUpgrade.FilesToRemove.Count == 0,
+    "Legacy installation with no signed release inventory must not be cleaned blindly.");
+var unsafePrevious = installed with
+{
+    ReleaseFilePaths = new[] { "../user-data.txt" }
+};
+var refusedUnsafeCleanup = false;
+try
+{
+    deploymentPlanner.Plan(upgradeManifest, unsafePrevious,
+        @"C:\Program Files\The Link", @"C:\ProgramData\The Link\Backups");
+}
+catch (InvalidOperationException)
+{
+    refusedUnsafeCleanup = true;
+}
+Assert(refusedUnsafeCleanup,
+    "Do not accept path traversal in any previous release inventory.");
+
 var downgradeBlocked = false;
 try
 {
