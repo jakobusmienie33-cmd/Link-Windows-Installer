@@ -1,3 +1,9 @@
+# V1 platform scope and closeout alignment — 3 November 2026
+
+This repository is a V1 supporting component only for the current Link-Core Windows desktop installation and update path. Its future OS/platform roadmap is not part of V1.
+
+See [V1 Platform Scope and Closeout](docs/V1_PLATFORM_SCOPE_AND_CLOSEOUT.md) and the [authoritative V1 master plan](https://github.com/jakobusmienie33-cmd/Link-Core/blob/main/docs/2026-11-03_V1_PLATFORM_DEVELOPMENT_AND_CODING_SUPABASE_CLOSEOUT_MASTER_PLAN.md).
+
 # The Link — Windows Installer
 
 Production-candidate source for **The Link Windows Installation & Configuration Wizard**.
